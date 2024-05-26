@@ -1,0 +1,15 @@
+{
+    "eslint.validate": ["javascript", "typescript"],
+
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    },
+
+    "javascript.preferences.quoteStyle": "single",
+    "typescript.preferences.quoteStyle": "single",
+
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
