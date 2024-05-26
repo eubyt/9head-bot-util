@@ -3,10 +3,12 @@
     "version": "0.0.1",
     "description": "Um bot de moderação para o servidor D9",
     "main": "./dist/start-bot.js",
-    "repository": "]",
     "author": "eubyt",
     "license": "MIT",
     "private": true,
+    "engines": {
+        "node": "22.x"
+    },
     "devDependencies": {
         "@eslint/js": "^9.2.0",
         "@flydotio/dockerfile": "^0.5.7",
@@ -28,7 +30,7 @@
     },
     "dependencies": {
         "discord.js": "^14.15.2",
-        "express": "^4.19.2",
-        "firebase-admin": "^12.1.1"
+        "firebase-admin": "^12.1.1",
+        "express": "^4.19.2"
     }
 }

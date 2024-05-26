@@ -2,8 +2,7 @@ node_modules/
 
 dist
 
-config/*.json
-
+.env
 
 yarn-debug.log*
 yarn-error.log*
