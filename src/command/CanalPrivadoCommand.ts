@@ -7,28 +7,35 @@ import {
 } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Firestore } from 'firebase-admin/firestore';
+import { Config } from '../model';
 
 export class CanalPrivadoCommand extends CommandCreator {
     public name = 'canalprivado';
     public name_localizations = null;
 
-    public description =
-        '「Canal Privado」 Gerencie o seu canal de voz privado.';
+    // Mensagem da descrição usando o arquivo de configurações
+    public description = Config.getLang('commands.canalprivado.description');
     public description_localizations = null;
 
     public options = [
         {
             type: 3,
             name: 'comando',
-            description: 'Selecione a ação que deseja realizar.',
+            description: Config.getLang(
+                'commands.canalprivado.actions.description',
+            ),
             required: true,
             choices: [
                 {
-                    name: 'Adicionar pessoa',
+                    name: Config.getLang(
+                        'commands.canalprivado.actions.options.add',
+                    ),
                     value: 'add',
                 },
                 {
-                    name: 'Remover pessoa',
+                    name: Config.getLang(
+                        'commands.canalprivado.actions.options.remove',
+                    ),
                     value: 'remove',
                 },
             ],
@@ -36,7 +43,9 @@ export class CanalPrivadoCommand extends CommandCreator {
         {
             type: 6,
             name: 'usuario',
-            description: 'Selecione o usuário que deseja adicionar/remover.',
+            description: Config.getLang(
+                'commands.canalprivado.add_user.description',
+            ),
             required: true,
         },
     ];
@@ -96,7 +105,12 @@ export class CanalPrivadoCommand extends CommandCreator {
         const userId = user.user?.id;
 
         if (!userId) {
-            await intr.reply({ content: 'Usuário inválido.', ephemeral: true });
+            await intr.reply({
+                content: Config.getLang(
+                    'commands.canalprivado.error_messages.user_invalid',
+                ),
+                ephemeral: true,
+            });
             return;
         }
 
@@ -104,7 +118,9 @@ export class CanalPrivadoCommand extends CommandCreator {
 
         if (!member || member.user.bot) {
             await intr.reply({
-                content: 'Você só pode adicionar ou remover usuários.',
+                content: Config.getLang(
+                    'commands.canalprivado.error_messages.bot_invalid',
+                ),
                 ephemeral: true,
             });
             return;
@@ -112,7 +128,9 @@ export class CanalPrivadoCommand extends CommandCreator {
 
         if (intr.user.id === userId) {
             await intr.reply({
-                content: 'Você não pode adicionar ou remover a si mesmo.',
+                content: Config.getLang(
+                    'commands.canalprivado.error_messages.self_invalid',
+                ),
                 ephemeral: true,
             });
             return;
@@ -136,7 +154,9 @@ export class CanalPrivadoCommand extends CommandCreator {
             privateChannelName = data.channelName;
         } else {
             await intr.reply({
-                content: 'Você não tem um canal privado.',
+                content: Config.getLang(
+                    'commands.canalprivado.error_messages.no_channel',
+                ),
                 ephemeral: true,
             });
             return;
@@ -154,12 +174,16 @@ export class CanalPrivadoCommand extends CommandCreator {
                     );
 
                     await intr.reply({
-                        content: `Usuário <@${userId}> adicionado ao canal privado com sucesso!`,
+                        content: Config.getLang(
+                            'commands.canalprivado.error_messages.user_added',
+                        ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
                 } else {
                     await intr.reply({
-                        content: `Usuário <@${userId}> já está autorizado a acessar o canal privado!`,
+                        content: Config.getLang(
+                            'commands.canalprivado.error_messages.user_already_added',
+                        ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
                 }
@@ -167,8 +191,6 @@ export class CanalPrivadoCommand extends CommandCreator {
             case 'remove':
                 if (allowedUsers.includes(userId)) {
                     allowedUsers = allowedUsers.filter((id) => id !== userId);
-
-                    console.log('Lista após remoção', allowedUsers);
 
                     await this.update(
                         intr.guild,
@@ -178,19 +200,25 @@ export class CanalPrivadoCommand extends CommandCreator {
                     );
 
                     await intr.reply({
-                        content: `Usuário <@${userId}> removido do canal privado com sucesso!`,
+                        content: Config.getLang(
+                            'commands.canalprivado.error_messages.user_removed',
+                        ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
                 } else {
                     await intr.reply({
-                        content: `Usuário <@${userId}> não está autorizado a acessar o canal privado!`,
+                        content: Config.getLang(
+                            'commands.canalprivado.error_messages.user_not_authorized',
+                        ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
                 }
                 break;
             default:
                 await intr.reply({
-                    content: 'Comando inválido.',
+                    content: Config.getLang(
+                        'commands.canalprivado.error_messages.invalid_command',
+                    ),
                     ephemeral: true,
                 });
         }

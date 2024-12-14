@@ -4,6 +4,60 @@
             "latency_test": "*Testando latência....*",
             "title": ":ping_pong:   Teste de latência",
             "description": "「Discord」 Verificar a latência do bot."
+        },
+        "canalprivado": {
+            "description": "「Canal Privado」 Gerencie o seu canal de voz privado.",
+            "actions": {
+                "description": "Ação que você deseja realizar.",
+                "options": {
+                    "add": "Adicionar pessoa",
+                    "remove": "Remover pessoa"
+                }
+            },
+            "add_user": {
+                "description": "Usuário que você deseja adicionar/remover."
+            },
+            "error_messages": {
+                "user_invalid": "Usuário inválido.",
+                "bot_invalid": "Você só pode adicionar ou remover usuários.",
+                "self_invalid": "Você não pode adicionar ou remover a si mesmo.",
+                "no_channel": "Você não tem um canal privado.",
+                "user_added": "Usuário <@{{userId}}> adicionado ao canal privado com sucesso!",
+                "user_already_added": "Usuário <@{{userId}}> já está autorizado a acessar o canal privado!",
+                "user_removed": "Usuário <@{{userId}}> removido do canal privado com sucesso!",
+                "user_not_authorized": "Usuário <@{{userId}}> não está autorizado a acessar o canal privado!",
+                "invalid_command": "Comando inválido."
+            }
+        },
+        "canalprivado_persistencia": {
+            "description": "「Canal Privado」 Alterna a persistência do seu canal privado (liga/desliga).",
+            "error_messages": {
+                "no_private_channel": "Você não possui um canal privado.",
+                "persistencia_error": "Não foi possível alternar a persistência para o canal."
+            },
+            "status_messages": {
+                "persistencia_toggled": "A persistência do canal `{{channelName}}` foi {{status}}.",
+                "persistencia_ativada": "ativado",
+                "persistencia_desativada": "desativado"
+            }
+        },
+        "canalprivado_rename": {
+            "description": "「Canal Privado」 Trocar o nome do seu canal privado.",
+            "options": {
+                "nome": {
+                    "description": "Digite o nome do seu canal"
+                }
+            },
+            "error_messages": {
+                "channel_name_too_long": "O nome do canal não pode exceder 32 caracteres.",
+                "no_private_channel": "Você não tem um canal privado.",
+                "channel_not_found": "Não consegui encontrar o seu canal privado. Certifique-se de estar no canal correto.",
+                "no_manage_permission": "Eu não tenho permissão para alterar o nome do canal. Por favor, verifique minhas permissões.",
+                "channel_exists_in_server": "Já existe um canal com este nome no servidor. Escolha um nome diferente.",
+                "channel_exists_in_firestore": "Já existe um canal com este nome. Escolha um nome diferente.",
+                "failed_to_create_channel": "Não foi possível criar o novo canal. Tente novamente mais tarde.",
+                "channel_rename_success": "O nome do canal foi alterado para  `{{newName}}`. O canal antigo foi deletado."
+            }
         }
     }
 }

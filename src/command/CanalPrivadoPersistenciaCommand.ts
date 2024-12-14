@@ -1,13 +1,16 @@
 import { CommandInteraction } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Firestore } from 'firebase-admin/firestore';
+import { Config } from '../model';
 
 export class CanalPrivadoPersistenciaCommand extends CommandCreator {
     public name = 'canalprivado-persistencia';
     public name_localizations = null;
 
-    public description =
-        '「Canal Privado」 Alterna a persistência do seu canal privado (liga/desliga).';
+    // Mensagem da descrição usando o arquivo de configurações
+    public description = Config.getLang(
+        'commands.canalprivado_persistencia.description',
+    );
     public description_localizations = null;
 
     public options = [];
@@ -25,7 +28,9 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
 
         if (!doc.exists) {
             await intr.reply({
-                content: 'Você não possui um canal privado.',
+                content: Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.no_private_channel',
+                ),
                 ephemeral: true,
             });
             return;
@@ -50,15 +55,27 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                 persistente: newPersistenteValue,
             });
 
-            const status = newPersistenteValue ? 'ativado' : 'desativado';
+            const status = newPersistenteValue
+                ? Config.getLang(
+                      'commands.canalprivado_persistencia.status_messages.persistencia_ativada',
+                  )
+                : Config.getLang(
+                      'commands.canalprivado_persistencia.status_messages.persistencia_desativada',
+                  );
+
             await intr.reply({
-                content: `A persistência do canal \`${privateChannelName}\` foi ${status}.`,
+                content: Config.getLang(
+                    'commands.canalprivado_persistencia.status_messages.persistencia_toggled',
+                )
+                    .replace('{{channelName}}', privateChannelName)
+                    .replace('{{status}}', status),
                 ephemeral: true,
             });
         } catch (error) {
             await intr.reply({
-                content:
-                    'Não foi possível alternar a persistência para o canal.',
+                content: Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.persistencia_error',
+                ),
                 ephemeral: true,
             });
             console.error('Erro ao alternar persistência:', error);

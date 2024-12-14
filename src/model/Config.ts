@@ -48,21 +48,25 @@ export class Config {
         console.log(`Loading ${this.NODE_ENV} config....`);
 
         try {
+            // Carregando o arquivo de configuração
             const configLoader = Loader.JSON(
                 `../config/${this.NODE_ENV}.json`,
             ) as unknown as ConfigData;
 
+            // Carrega dados do Discord a partir das variáveis de ambiente
             configLoader.Config_Discord_BOT = {
                 id: process.env.DISCORD_ID ?? 'invalid',
                 token: process.env.DISCORD_TOKEN ?? 'invalid',
             };
 
-            process.env.DISCORD_TOKEN ?? 'invalid';
-
+            // Define a configuração
             Config.setConfig(configLoader);
-        } catch (err) {
+        } catch (err: unknown) {
+            // Lida com erro ao carregar configuração
             throw new Error(
-                `The ${this.NODE_ENV} configuration file is missing....`,
+                `Configuration file is missing or invalid: ${
+                    err instanceof Error ? err.message : 'Unknown error'
+                }`,
             );
         }
     }
@@ -78,10 +82,27 @@ export class Config {
         this._config = config;
     }
 
+    // Melhorando o carregamento de idiomas e garantindo que erros sejam tratados
     public static getLang(prop: string, lang: LangType = 'pt_BR') {
+        // Se não carregou ainda, tenta carregar o arquivo de idioma
         if (Object.keys(this._language[lang]).length === 0) {
-            const langData = Loader.JSON(`../lang/${lang}.json`);
-            this._language[lang] = langData;
+            try {
+                const langData = Loader.JSON(`../lang/${lang}.json`);
+                console.log('Idioma carregado:', langData); // Verifica se o arquivo foi carregado corretamente
+                this._language[lang] = langData;
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    // Caso o erro seja uma instância de Error
+                    throw new Error(
+                        `Configuration file for language "${lang}" is missing or invalid: ${err.message}`,
+                    );
+                } else {
+                    // Caso o erro não seja um Error válido
+                    throw new Error(
+                        `Configuration file for language "${lang}" is missing or invalid, and the error is not an instance of Error.`,
+                    );
+                }
+            }
         }
 
         const data = this._language[lang];
@@ -98,6 +119,9 @@ export class Config {
             return result.toString();
         }
 
-        throw new Error(`"${prop}" must be a string or number`);
+        // Adiciona log para depuração do tipo do valor retornado
+        throw new Error(
+            `"${prop}" must be a string or number, but got ${typeof result}`,
+        );
     }
 }
