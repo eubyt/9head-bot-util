@@ -54,6 +54,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     parent: channel.parentId,
                     type: ChannelType.GuildVoice,
                     userLimit: 10,
+                    bitrate: channel.guild.maximumBitrate,
                 });
             } catch (e) {
                 console.log('Não foi possivel criar o canal', channelName);

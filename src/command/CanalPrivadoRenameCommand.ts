@@ -142,6 +142,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 type: ChannelType.GuildVoice,
                 parent: channel.parentId, // Manter a mesma categoria
                 userLimit: channel.userLimit,
+                bitrate: channel.guild.maximumBitrate,
                 permissionOverwrites: channel.permissionOverwrites.cache.map(
                     (overwrite) => ({
                         id: overwrite.id,

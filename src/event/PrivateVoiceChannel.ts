@@ -122,6 +122,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     type: ChannelType.GuildVoice,
                     userLimit: 10,
                     permissionOverwrites,
+                    bitrate: channel.guild.maximumBitrate,
                 });
 
                 await newState.member.voice.setChannel(newChannel);
