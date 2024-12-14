@@ -1,0 +1,10 @@
+node_modules/
+
+dist
+
+.env
+
+yarn-debug.log*
+yarn-error.log*
+
+build_env.sh

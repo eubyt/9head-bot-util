@@ -1,0 +1,9 @@
+{
+    "commands": {
+        "ping": {
+            "latency_test": "*Testando latência....*",
+            "title": ":ping_pong:   Teste de latência",
+            "description": "「Discord」 Verificar a latência do bot."
+        }
+    }
+}
