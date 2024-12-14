@@ -8,6 +8,7 @@ import {
 } from 'discord.js';
 import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
+import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
 
 interface VoiceChannelData {
     channelName: string;
@@ -43,11 +44,17 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         const userId = newState.member?.id;
 
         if (!userId) {
-            console.error('User ID not found');
+            void Logger.error('PrivateVoiceChannel', 'User ID not found.');
             return;
         }
 
-        const docRef = this.db.collection('privateVoiceChannels').doc(userId);
+        // Modificação: A coleção é agora identificada pelo ID do servidor (guild)
+        const guildId = guild.id;
+        const docRef = this.db
+            .collection('guilds')
+            .doc(guildId)
+            .collection('privateVoiceChannels')
+            .doc(userId);
         const doc = await docRef.get();
 
         if (
@@ -58,13 +65,27 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             if (doc.exists) {
                 const data = doc.data() as VoiceChannelData;
                 if (data.persistente) {
-                    console.log('O canal é persistente.');
+                    Logger.info(
+                        'PrivateVoiceChannel',
+                        `O canal de ${userId} é persistente.`,
+                    );
                     return;
                 }
             }
 
-            await oldState.channel.delete();
-            console.log('Canal de voz removido com sucesso!');
+            try {
+                await oldState.channel.delete();
+                Logger.info(
+                    'PrivateVoiceChannel',
+                    `Canal de voz removido com sucesso: ${oldState.channel.name}`,
+                );
+            } catch (error) {
+                void Logger.error(
+                    'PrivateVoiceChannel',
+                    `Erro ao remover o canal de voz: ${String(error)}`,
+                );
+            }
+
             return;
         }
 
@@ -76,7 +97,10 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
 
-                    console.log('Localizado o canal: ', channelName);
+                    Logger.info(
+                        'PrivateVoiceChannel',
+                        `Canal encontrado: ${channelName}`,
+                    );
                 } else {
                     allowedUsers = [userId];
                     await docRef.set({
@@ -93,8 +117,9 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
 
                 if (existingChannel) {
                     await newState.member.voice.setChannel(existingChannel);
-                    console.log(
-                        'Usuário movido para o canal existente com sucesso!',
+                    Logger.info(
+                        'PrivateVoiceChannel',
+                        `Usuário ${userId} movido para o canal existente: ${existingChannel.name}`,
                     );
                     return;
                 }
@@ -111,7 +136,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 });
 
                 permissionOverwrites.push({
-                    id: Config.getConfig('Config_Discord_BOT').id,
+                    id: Config.getConfigLocal().Config_Discord_BOT.id,
                     allow: ['ViewChannel', 'ManageChannels', 'MoveMembers'],
                 });
 
@@ -126,7 +151,10 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 });
 
                 await newState.member.voice.setChannel(newChannel);
-                console.log('Canal de voz criado com sucesso!');
+                Logger.info(
+                    'PrivateVoiceChannel',
+                    `Canal de voz criado com sucesso: ${newChannel.name}`,
+                );
 
                 // Enviar a mensagem explicativa no canal de texto
                 await newChannel.send({
@@ -137,9 +165,9 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 });
             }
         } catch (error) {
-            console.error(
-                'Não foi possível mover o usuário ou criar o documento no Firestore.',
-                error,
+            void Logger.error(
+                'PrivateVoiceChannel',
+                `Erro ao mover o usuário ou criar o documento no Firestore: ${String(error)}`,
             );
         }
     }

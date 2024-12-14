@@ -58,6 +58,57 @@
                 "failed_to_create_channel": "Não foi possível criar o novo canal. Tente novamente mais tarde.",
                 "channel_rename_success": "O nome do canal foi alterado para  `{{newName}}`. O canal antigo foi deletado."
             }
+        },
+        "setautovoicechannel": {
+            "actions": {
+                "description": "Configura o canal de voz automático para um servidor.",
+                "options": {
+                    "add": "Adicionar categoria para o canal de voz automático.",
+                    "remove": "Remover categoria do canal de voz automático.",
+                    "clear": "Limpar todos os canais automáticos."
+                }
+            },
+            "select_channel": {
+                "description": "Selecione uma categoria de canal onde os canais automáticos serão criados."
+            },
+            "error_messages": {
+                "no_permission": "Você não tem permissão para gerenciar canais.",
+                "general_error": "Ocorreu um erro ao tentar configurar o canal de voz automático.",
+                "category_not_found": "Categoria não encontrada ou não válida.",
+                "category_already_exists": "Essa categoria já está configurada para canais automáticos.",
+                "invalid_input": "Por favor, forneça uma categoria válida para o canal de voz automático."
+            },
+            "success_messages": {
+                "category_added": "Categoria {{categoryName}} adicionada com sucesso aos canais automáticos.",
+                "category_removed": "Categoria {{categoryName}} removida com sucesso dos canais automáticos.",
+                "channels_cleared": "Todos os canais automáticos foram limpos com sucesso."
+            }
+        },
+        "setprivatevoicechannel": {
+            "actions": {
+                "description": "Configurar canais de voz privados para o servidor.",
+                "options": {
+                    "add": "Adicionar canal de voz privado",
+                    "remove": "Remover canal de voz privado",
+                    "clear": "Limpar todos os canais de voz privados"
+                }
+            },
+            "select_channel": {
+                "description": "Selecione uma categoria e um canal de voz para configurar."
+            },
+            "error_messages": {
+                "general_error": "Ocorreu um erro ao tentar processar o comando.",
+                "no_permission": "Você não tem permissão para gerenciar canais.",
+                "category_not_found": "Categoria não encontrada. Certifique-se de selecionar uma categoria válida.",
+                "invalid_input": "Por favor, forneça tanto a categoria quanto o canal de voz para prosseguir.",
+                "channel_already_exists": "O canal de voz já foi adicionado a essa categoria.",
+                "channel_not_found": "O canal de voz não foi encontrado para ser removido."
+            },
+            "success_messages": {
+                "channels_cleared": "Todos os canais de voz privados foram removidos com sucesso.",
+                "channel_added": "Canal de voz privado adicionado com sucesso na categoria {{channelName}}.",
+                "channel_removed": "Canal de voz privado removido com sucesso."
+            }
         }
     }
 }

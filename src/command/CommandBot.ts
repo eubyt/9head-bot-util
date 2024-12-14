@@ -1,10 +1,11 @@
 import {
+    ColorResolvable,
     CommandInteraction,
     EmbedBuilder,
     LocalizationMap,
     User,
 } from 'discord.js';
-import { Config } from '../model/Config';
+import { ConfigData } from '../model/Config';
 
 export interface CommandName {
     name: string;
@@ -25,7 +26,10 @@ export interface CommandBot {
 
     options: unknown[];
 
-    execute(intr: CommandInteraction): Promise<void>;
+    execute(
+        intr: CommandInteraction,
+        configData: ConfigData | undefined,
+    ): Promise<void>;
 }
 
 export abstract class CommandCreator implements CommandBot {
@@ -37,16 +41,19 @@ export abstract class CommandCreator implements CommandBot {
     abstract description: string;
     abstract description_localizations: LocalizationMap | null;
 
-    abstract execute(intr: CommandInteraction): Promise<void>;
+    abstract execute(
+        intr: CommandInteraction,
+        configData: ConfigData | undefined,
+    ): Promise<void>;
 
-    public BasicEmbed(user: User) {
+    public BasicEmbed(user: User, color: ColorResolvable) {
         return new EmbedBuilder()
             .setTimestamp()
             .setFooter({
                 text: user.id,
                 iconURL: user.avatarURL()?.toString(),
             })
-            .setColor(Config.getConfig('Embed').default);
+            .setColor(color);
     }
 
     public getJSON() {

@@ -8,6 +8,7 @@ import {
 import { CommandCreator } from './CommandBot';
 import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
+import { Logger } from '../model/Logger';
 
 export class CanalPrivadoCommand extends CommandCreator {
     public name = 'canalprivado';
@@ -96,6 +97,12 @@ export class CanalPrivadoCommand extends CommandCreator {
             channelName: channelName,
             permissions: permissions,
         });
+
+        // Logando a atualização
+        Logger.info(
+            'CanalPrivadoCommand',
+            `Canal ${channelName} atualizado com permissões: ${permissions.join(', ')}`,
+        );
     }
 
     async execute(intr: CommandInteraction): Promise<void> {
@@ -111,6 +118,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
+            void Logger.warn(
+                'CanalPrivadoCommand',
+                `Usuário inválido recebido: ${String(userId)}`,
+            );
             return;
         }
 
@@ -123,6 +134,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
+            void Logger.warn(
+                'CanalPrivadoCommand',
+                `Tentativa de adicionar bot ao canal privado: ${userId}`,
+            );
             return;
         }
 
@@ -133,6 +148,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
+            void Logger.warn(
+                'CanalPrivadoCommand',
+                `Tentativa de adicionar usuário a si mesmo: ${userId}`,
+            );
             return;
         }
 
@@ -152,6 +171,10 @@ export class CanalPrivadoCommand extends CommandCreator {
 
             allowedUsers = data.permissions;
             privateChannelName = data.channelName;
+            Logger.info(
+                'CanalPrivadoCommand',
+                `Configurações carregadas para o canal privado: ${privateChannelName}`,
+            );
         } else {
             await intr.reply({
                 content: Config.getLang(
@@ -159,6 +182,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
+            void Logger.warn(
+                'CanalPrivadoCommand',
+                `Nenhum canal privado encontrado para o usuário: ${intr.user.id}`,
+            );
             return;
         }
 
@@ -179,6 +206,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
+                    Logger.info(
+                        'CanalPrivadoCommand',
+                        `Usuário ${userId} adicionado ao canal privado: ${privateChannelName}`,
+                    );
                 } else {
                     await intr.reply({
                         content: Config.getLang(
@@ -186,6 +217,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
+                    void Logger.warn(
+                        'CanalPrivadoCommand',
+                        `Usuário ${userId} já estava no canal privado: ${privateChannelName}`,
+                    );
                 }
                 break;
             case 'remove':
@@ -205,6 +240,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
+                    Logger.info(
+                        'CanalPrivadoCommand',
+                        `Usuário ${userId} removido do canal privado: ${privateChannelName}`,
+                    );
                 } else {
                     await intr.reply({
                         content: Config.getLang(
@@ -212,6 +251,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', userId),
                         ephemeral: true,
                     });
+                    void Logger.warn(
+                        'CanalPrivadoCommand',
+                        `Usuário ${userId} não autorizado a acessar o canal privado: ${privateChannelName}`,
+                    );
                 }
                 break;
             default:
@@ -221,6 +264,10 @@ export class CanalPrivadoCommand extends CommandCreator {
                     ),
                     ephemeral: true,
                 });
+                void Logger.warn(
+                    'CanalPrivadoCommand',
+                    `Comando inválido para o usuário ${intr.user.id}: ${String(subcommand.value)}`,
+                );
         }
     }
 }

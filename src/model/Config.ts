@@ -1,7 +1,9 @@
 import { ColorResolvable } from 'discord.js';
 import { Loader } from '../util/Loader';
+import { Logger } from './Logger'; // Supondo que o Logger esteja sendo importado
+import { Firestore } from 'firebase-admin/firestore';
 
-interface ConfigData {
+export interface ConfigData {
     Discord_User_ID_DEV: string[];
     Config_Discord_BOT: {
         id: string;
@@ -30,6 +32,14 @@ export class Config {
     private static _language: Record<LangType, Record<string, unknown>> = {
         pt_BR: {},
     };
+    private static db: Firestore = // Iniciar a instância do Firestore
+        // Adapte o código abaixo para inicializar sua instância Firestore
+        new Firestore();
+
+    public static configCache = new Map<
+        string,
+        Omit<ConfigData, 'Discord_User_ID_DEV' | 'Config_Discord_BOT'>
+    >();
 
     constructor(private NODE_ENV: EnvType = process.env.NODE_ENV as EnvType) {
         this.validateEnv();
@@ -38,70 +48,156 @@ export class Config {
 
     private validateEnv() {
         if (!ALLOWED_NODE_ENV.includes(this.NODE_ENV)) {
-            throw new Error(
-                `Invalid NODE_ENV value: ${this.NODE_ENV}. It must be either 'development' or 'production'.`,
-            );
+            const errorMessage = `Invalid NODE_ENV value: ${this.NODE_ENV}. It must be either 'development' or 'production'.`;
+            void Logger.error('Config Validation', errorMessage);
+            return;
         }
+        Logger.info('Config Validation', `NODE_ENV set to: ${this.NODE_ENV}`);
     }
 
     private loadConfig() {
-        console.log(`Loading ${this.NODE_ENV} config....`);
+        Logger.info('Config Loading', `Loading ${this.NODE_ENV} config....`);
 
         try {
-            // Carregando o arquivo de configuração
             const configLoader = Loader.JSON(
                 `../config/${this.NODE_ENV}.json`,
             ) as unknown as ConfigData;
 
-            // Carrega dados do Discord a partir das variáveis de ambiente
             configLoader.Config_Discord_BOT = {
                 id: process.env.DISCORD_ID ?? 'invalid',
                 token: process.env.DISCORD_TOKEN ?? 'invalid',
             };
 
-            // Define a configuração
             Config.setConfig(configLoader);
-        } catch (err: unknown) {
-            // Lida com erro ao carregar configuração
-            throw new Error(
-                `Configuration file is missing or invalid: ${
-                    err instanceof Error ? err.message : 'Unknown error'
-                }`,
+
+            Logger.info(
+                'Config Loading',
+                'Configuração carregada com sucesso.',
             );
+        } catch (err: unknown) {
+            const errorMessage = `Configuration file is missing or invalid: ${
+                err instanceof Error ? err.message : 'Unknown error'
+            }`;
+            void Logger.error('Config Loading', errorMessage);
+            return;
         }
     }
 
-    public static getConfig(): ConfigData;
-    public static getConfig<T extends keyof ConfigData>(opt: T): ConfigData[T];
-    public static getConfig<T extends keyof ConfigData>(opt?: T) {
-        if (opt) return this._config[opt];
+    public static getConfigLocal(): ConfigData {
         return this._config;
+    }
+
+    public static async getConfig(
+        guildId: string,
+    ): Promise<ConfigData | undefined> {
+        // Busca a configuração do servidor no Firestore
+        const guildConfigRef = this.db.collection('guilds').doc(guildId);
+        const guildConfigDoc = await guildConfigRef.get();
+
+        if (guildConfigDoc.exists) {
+            const guildConfig = guildConfigDoc.data() as ConfigData;
+            return guildConfig;
+        } else {
+            void Logger.error(
+                'Config Fetch',
+                `No configuration found for guild with ID: ${guildId}`,
+            );
+            return undefined;
+        }
     }
 
     public static setConfig(config: ConfigData) {
         this._config = config;
     }
 
-    // Melhorando o carregamento de idiomas e garantindo que erros sejam tratados
+    public static setDatabase(db: Firestore) {
+        this.db = db;
+    }
+
+    public static async checkAndCreateGuildConfig(guildId: string) {
+        // Verificar se o cache já possui a configuração
+        if (this.configCache.has(guildId)) {
+            return this.configCache.get(guildId);
+        }
+
+        const guildConfigRef = this.db.collection('guilds').doc(guildId);
+        const guildConfigDoc = await guildConfigRef.get();
+
+        const defaultConfig: Omit<
+            ConfigData,
+            'Discord_User_ID_DEV' | 'Config_Discord_BOT'
+        > = {
+            AutoVoiceChannel: [],
+            PrivateVoiceChannel: [],
+            Embed: {
+                default: '#000000',
+            },
+        };
+
+        let guildConfig: typeof defaultConfig;
+
+        if (!guildConfigDoc.exists) {
+            // Criar nova configuração se não existir
+            await guildConfigRef.set(defaultConfig);
+            guildConfig = defaultConfig;
+
+            Logger.info(
+                'Guild Config Creation',
+                `Configuração criada para a guild ${guildId}`,
+            );
+        } else {
+            // Carregar configuração existente
+            const existingConfig = guildConfigDoc.data() as Partial<
+                typeof defaultConfig
+            >;
+            guildConfig = { ...defaultConfig, ...existingConfig };
+
+            // Atualizar campos ausentes na configuração existente
+            const missingFields = Object.keys(defaultConfig).filter(
+                (key): key is keyof typeof defaultConfig =>
+                    !(key in existingConfig),
+            );
+
+            if (missingFields.length > 0) {
+                missingFields.forEach((key) => {
+                    (guildConfig[key] as any) = defaultConfig[key];
+                });
+
+                await guildConfigRef.set(guildConfig);
+                Logger.info(
+                    'Guild Config Update',
+                    `Configuração atualizada para a guild ${guildId}. Campos ausentes adicionados: ${missingFields.join(
+                        ', ',
+                    )}`,
+                );
+            }
+        }
+
+        // Adicionar ao cache
+        this.configCache.set(guildId, guildConfig);
+
+        return guildConfig;
+    }
+
+    public static getGuildCollection(guildId: string) {
+        return this.db.collection('guilds').doc(guildId);
+    }
+
     public static getLang(prop: string, lang: LangType = 'pt_BR') {
-        // Se não carregou ainda, tenta carregar o arquivo de idioma
         if (Object.keys(this._language[lang]).length === 0) {
             try {
                 const langData = Loader.JSON(`../lang/${lang}.json`);
-                console.log('Idioma carregado:', langData); // Verifica se o arquivo foi carregado corretamente
+                Logger.info(
+                    'Lang Loading',
+                    `Idioma ${lang} carregado com sucesso.`,
+                );
                 this._language[lang] = langData;
             } catch (err: unknown) {
-                if (err instanceof Error) {
-                    // Caso o erro seja uma instância de Error
-                    throw new Error(
-                        `Configuration file for language "${lang}" is missing or invalid: ${err.message}`,
-                    );
-                } else {
-                    // Caso o erro não seja um Error válido
-                    throw new Error(
-                        `Configuration file for language "${lang}" is missing or invalid, and the error is not an instance of Error.`,
-                    );
-                }
+                const errorMessage = `Configuration file for language "${lang}" is missing or invalid: ${
+                    err instanceof Error ? err.message : 'Unknown error'
+                }`;
+                void Logger.error('Lang Loading', errorMessage);
+                return 'Invalid';
             }
         }
 
@@ -119,9 +215,8 @@ export class Config {
             return result.toString();
         }
 
-        // Adiciona log para depuração do tipo do valor retornado
-        throw new Error(
-            `"${prop}" must be a string or number, but got ${typeof result}`,
-        );
+        const errorMessage = `"${prop}" must be a string or number, but got ${typeof result}`;
+        void Logger.error('Lang Loading', errorMessage);
+        return 'Invalid';
     }
 }

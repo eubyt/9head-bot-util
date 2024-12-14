@@ -4,55 +4,83 @@ import { CommandHandle } from './event/CommandHandle';
 import { CommandCreator, PingCommand } from './command';
 import { Config, DiscordBot } from './model';
 import { AutoVoiceChannel } from './event/AutoVoiceChannel';
-import { PrivateVoiceChannel } from './event/PrivateVoiceChannel';
+// import { PrivateVoiceChannel } from './event/PrivateVoiceChannel';
 import { ServiceAccount, initializeApp } from 'firebase-admin/app';
 import { credential, firestore } from 'firebase-admin';
 import { CanalPrivadoCommand } from './command/CanalPrivadoCommand';
 import { CanalPrivadoRenameCommand } from './command/CanalPrivadoRenameCommand';
 import { CanalPrivadoPersistenciaCommand } from './command/CanalPrivadoPersistenciaCommand';
+import { Logger } from './model/Logger';
+import { SetAutoVoiceChannelCommand } from './command/SetAutoVoiceChannelCommand';
+import { SetPrivateChannelCommand } from './command/SetPrivateChannelCommand';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
 
 async function start(): Promise<void> {
-    new Config(); // Loading Config
+    Logger.init(
+        'https://discord.com/api/webhooks/1317535929727975538/XzucauZ8riW_SOsdpijTvOZCoZ_aECZRNe1b0PxaJQrP8ZC5JPtiYPXBvL-sPif3QI4c',
+    );
 
     if (!process.env.FIREBASE_ADMIN) {
+        void Logger.error(
+            'Firebase Configuration',
+            'Chave Firebase admin inválida',
+        );
         throw new Error('Firebase key admin invalid');
     }
 
-    initializeApp({
-        credential: credential.cert(
-            JSON.parse(process.env.FIREBASE_ADMIN) as ServiceAccount,
-        ),
-    });
+    try {
+        initializeApp({
+            credential: credential.cert(
+                JSON.parse(process.env.FIREBASE_ADMIN) as ServiceAccount,
+            ),
+        });
 
+        Logger.info(
+            'Firebase Initialization',
+            'Inicialização do Firebase realizada com sucesso',
+        );
+    } catch (error) {
+        if (error instanceof Error) {
+            void Logger.error(
+                'Firebase Initialization',
+                `Erro ao inicializar o Firebase: ${error.message}`,
+            );
+        } else {
+            void Logger.error(
+                'Firebase Initialization',
+                'Erro desconhecido ao inicializar o Firebase',
+            );
+        }
+        throw error;
+    }
+
+    new Config();
     const db = firestore();
+    Config.setDatabase(db);
 
-    /// Discord bot \/
+    Logger.info(
+        'Bot Initialization',
+        'Iniciando o processo de inicialização do bot...',
+    );
 
     // Criar os Eventos
     const commandHandle = new CommandHandle([
+        new SetAutoVoiceChannelCommand(),
+        new SetPrivateChannelCommand(),
         new PingCommand(),
         new CanalPrivadoCommand(db),
         new CanalPrivadoRenameCommand(db),
         new CanalPrivadoPersistenciaCommand(db),
     ]);
 
-    // AutoVoiceChannel
-    const autoVoiceChannel = new AutoVoiceChannel(
-        Config.getConfig().AutoVoiceChannel,
-    );
-
-    const privateVoiceChannel = new PrivateVoiceChannel(
-        Config.getConfig().PrivateVoiceChannel,
-        db,
-    );
+    // const privateVoiceChannel = new PrivateVoiceChannel(db);
 
     const bot = new DiscordBot({
         commandHandle,
-        autoVoiceChannel,
-        privateVoiceChannel,
+        autoVoiceChannel: new AutoVoiceChannel(),
+        privateVoiceChannel: null,
         client: new Client({
             intents: [
                 GatewayIntentBits.Guilds,
@@ -61,28 +89,73 @@ async function start(): Promise<void> {
         }),
     });
 
-    /**
-     * Registrar os comandos
-     * Obs: Não sei se é uma boa prática ficar registrando sempre
-     */
-
-    const { token, id } = Config.getConfig('Config_Discord_BOT');
+    // Registrar os comandos
+    const { token, id } = Config.getConfigLocal().Config_Discord_BOT;
     const rest = new REST({ version: '10' }).setToken(token);
 
-    console.log(
-        'lista de comandos',
-        commandHandle.commands.map((x) => x.name),
+    Logger.info(
+        'Command Registration',
+        'Iniciando o processo de registro de comandos...',
     );
 
-    await rest.put(Routes.applicationCommands(id), {
-        body: commandHandle.commands.map((command) =>
-            (command as CommandCreator).getJSON(),
-        ),
-    });
+    try {
+        await rest.put(Routes.applicationCommands(id), {
+            body: commandHandle.commands.map((command) =>
+                (command as CommandCreator).getJSON(),
+            ),
+        });
 
-    await bot.start();
+        Logger.info(
+            'Command Registration',
+            'Comandos registrados com sucesso no Discord',
+        );
+    } catch (error) {
+        if (error instanceof Error) {
+            void Logger.error(
+                'Command Registration',
+                `Erro ao registrar comandos no Discord: ${error.message}`,
+            );
+        } else {
+            void Logger.error(
+                'Command Registration',
+                'Erro desconhecido ao registrar comandos no Discord',
+            );
+        }
+        throw error;
+    }
+
+    try {
+        await bot.start();
+        Logger.info(
+            'Bot Startup',
+            'Bot iniciado com sucesso e funcionando normalmente',
+        );
+    } catch (error) {
+        if (error instanceof Error) {
+            void Logger.error(
+                'Bot Startup',
+                `Erro ao iniciar o bot: ${error.message}`,
+            );
+        } else {
+            void Logger.error(
+                'Bot Startup',
+                'Erro desconhecido ao iniciar o bot',
+            );
+        }
+        throw error;
+    }
 }
 
 start().catch((err: unknown) => {
-    console.log(err);
+    if (err instanceof Error) {
+        void Logger.error(
+            'Application Error',
+            `Erro não tratado na execução da aplicação: ${err.message}`,
+        );
+    } else {
+        void Logger.error(
+            'Application Error',
+            'Erro desconhecido na execução da aplicação',
+        );
+    }
 });

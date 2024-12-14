@@ -2,6 +2,8 @@ import { CommandInteraction } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Loader } from '../util/Loader';
 import { Config } from '../model';
+import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
+import { ConfigData } from '../model/Config';
 
 export class PingCommand extends CommandCreator {
     public name = 'ping';
@@ -12,7 +14,15 @@ export class PingCommand extends CommandCreator {
 
     public options = [];
 
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(
+        intr: CommandInteraction,
+        configData: ConfigData | undefined,
+    ): Promise<void> {
+        Logger.info(
+            'PingCommand',
+            `Comando ping iniciado pelo usuário ${intr.user.id}`,
+        );
+
         const sent = await intr.reply({
             content: Config.getLang('commands.ping.latency_test'),
             files: [
@@ -35,7 +45,10 @@ export class PingCommand extends CommandCreator {
             description += `WebSocket: \x1b[2;31m${websocket_heartbeat}ms\x1b[0m`;
         }
 
-        const PingEmbed = this.BasicEmbed(intr.user)
+        const PingEmbed = this.BasicEmbed(
+            intr.user,
+            configData?.Embed.default ?? Config.getConfigLocal().Embed.default,
+        )
             .setTitle(Config.getLang('commands.ping.title'))
             .setDescription(`\`\`\`ansi\n${description}\n\`\`\``);
 
@@ -44,5 +57,10 @@ export class PingCommand extends CommandCreator {
             files: [],
             embeds: [PingEmbed],
         });
+
+        Logger.info(
+            'PingCommand',
+            `Latência para o usuário ${intr.user.id}: roundtrip ${latency_roundtrip}ms, websocket ${websocket_heartbeat}ms`,
+        );
     }
 }

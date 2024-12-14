@@ -1,17 +1,15 @@
 import { EventHandler } from './EventHandler';
 import { CategoryChannel, ChannelType, VoiceState } from 'discord.js';
+import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
+import { Config } from '../model';
 
 export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
-    constructor(
-        public categoryId: {
-            name: string;
-            categoryId: string;
-        }[],
-    ) {}
-
     async execute(oldState: VoiceState, newState: VoiceState) {
+        const config = await Config.getConfig(newState.guild.id);
+        if (config === undefined) return;
+
         const channel = newState.channel ?? oldState.channel;
-        const { name } = this.categoryId.find(
+        const { name } = config.AutoVoiceChannel.find(
             (x) => x.categoryId === channel?.parentId,
         ) ?? {
             name: null,
@@ -41,14 +39,19 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             );
 
             if (emptyChannels.size > 0) {
-                console.log(
-                    'Canais vazios:',
-                    emptyChannels.map((x) => x.name),
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Canais vazios encontrados: ${emptyChannels.map((x) => x.name).join(', ')}`,
                 );
                 return;
             }
 
             try {
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Criando novo canal: ${channelName}`,
+                );
+
                 await channel.guild.channels.create({
                     name: channelName,
                     parent: channel.parentId,
@@ -56,8 +59,16 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     userLimit: 10,
                     bitrate: channel.guild.maximumBitrate,
                 });
+
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Canal criado com sucesso: ${channelName}`,
+                );
             } catch (e) {
-                console.log('Não foi possivel criar o canal', channelName);
+                void Logger.error(
+                    'AutoVoiceChannel',
+                    `Não foi possível criar o canal ${channelName}: ${String(e)}`,
+                );
             }
 
             return;
@@ -72,11 +83,21 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Tentando deletar o canal vazio: ${deleteChannel.name}`,
+                );
+
                 await deleteChannel.delete();
+
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Canal deletado com sucesso: ${deleteChannel.name}`,
+                );
             } catch (e) {
-                console.log(
-                    'Não foi possivel deletar o canal',
-                    deleteChannel.name,
+                void Logger.error(
+                    'AutoVoiceChannel',
+                    `Não foi possível deletar o canal ${deleteChannel.name}: ${String(e)}`,
                 );
             }
         }

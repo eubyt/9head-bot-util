@@ -7,6 +7,7 @@ import {
 import { CommandCreator } from './CommandBot';
 import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
+import { Logger } from '../model/Logger'; // Supondo que o Logger seja importado de um arquivo
 
 export class CanalPrivadoRenameCommand extends CommandCreator {
     public name = 'canalprivado-rename';
@@ -36,10 +37,16 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         await intr.deferReply({ ephemeral: true });
 
         const newName = intr.options.get('nome', true).value as string;
-        console.log(`Novo nome recebido: ${newName}`);
+        Logger.info(
+            'CanalPrivadoRenameCommand',
+            `Novo nome recebido: ${newName}`,
+        );
 
         if (newName.length > 32) {
-            console.log('Nome do canal excedeu o limite de 32 caracteres.');
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
+                'Nome do canal excedeu o limite de 32 caracteres.',
+            );
             await intr.editReply({
                 content: Config.getLang(
                     'commands.canalprivado_rename.error_messages.channel_name_too_long',
@@ -54,7 +61,10 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            console.log('Usuário não tem um canal privado no Firestore.');
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
+                `Usuário ${intr.user.id} não tem um canal privado.`,
+            );
             await intr.editReply({
                 content: Config.getLang(
                     'commands.canalprivado_rename.error_messages.no_private_channel',
@@ -68,7 +78,8 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             permissions: string[];
         };
         const privateChannelName = data.channelName;
-        console.log(
+        Logger.info(
+            'CanalPrivadoRenameCommand',
             `Nome do canal privado no Firestore: ${privateChannelName}`,
         );
 
@@ -79,8 +90,9 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         ) as VoiceChannel | undefined;
 
         if (!channel) {
-            console.log(
-                `Não consegui encontrar o canal ${privateChannelName} no servidor.`,
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
+                `Canal ${privateChannelName} não encontrado no servidor.`,
             );
             await intr.editReply({
                 content: Config.getLang(
@@ -95,7 +107,10 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             !botMember ||
             !channel.permissionsFor(botMember).has('ManageChannels')
         ) {
-            console.log('Bot não tem permissão para gerenciar o canal.');
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
+                'Bot não tem permissão para gerenciar o canal.',
+            );
             await intr.editReply({
                 content: Config.getLang(
                     'commands.canalprivado_rename.error_messages.no_manage_permission',
@@ -111,7 +126,8 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         );
 
         if (existingChannel) {
-            console.log(
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no servidor.`,
             );
             await intr.editReply({
@@ -128,7 +144,8 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             .get();
 
         if (!existingChannelQuery.empty) {
-            console.log(
+            void Logger.warn(
+                'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no Firestore.`,
             );
             await intr.editReply({
@@ -140,7 +157,10 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         }
 
         try {
-            console.log(`Criando novo canal com o nome ${newName}...`);
+            Logger.info(
+                'CanalPrivadoRenameCommand',
+                `Criando novo canal com o nome ${newName}...`,
+            );
             const newChannel = await intr.guild.channels.create({
                 name: newName,
                 type: ChannelType.GuildVoice,
@@ -156,7 +176,10 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 ),
             });
 
-            console.log(`Novo canal criado com o nome ${newName}.`);
+            Logger.info(
+                'CanalPrivadoRenameCommand',
+                `Novo canal criado com o nome ${newName}.`,
+            );
 
             const members = channel.members;
             const movePromises = members.map((member: GuildMember) =>
@@ -164,11 +187,17 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             );
 
             await Promise.all(movePromises);
-            console.log('Todos os membros foram movidos para o novo canal.');
+            Logger.info(
+                'CanalPrivadoRenameCommand',
+                'Todos os membros foram movidos para o novo canal.',
+            );
 
             if (!channel.deletable) {
                 await channel.delete();
-                console.log(`Canal antigo ${privateChannelName} deletado.`);
+                Logger.info(
+                    'CanalPrivadoRenameCommand',
+                    `Canal antigo ${privateChannelName} deletado.`,
+                );
             }
 
             await docRef.update({
@@ -181,7 +210,10 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 ).replace('{{newName}}', newName),
             });
         } catch (error) {
-            console.error('Erro ao tentar alterar o nome do canal:', error);
+            void Logger.error(
+                'CanalPrivadoRenameCommand',
+                `Erro ao tentar alterar o nome do canal: ${String(error)}`,
+            );
 
             await intr.editReply({
                 content: Config.getLang(

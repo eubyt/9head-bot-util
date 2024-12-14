@@ -7,7 +7,7 @@
     "license": "MIT",
     "private": true,
     "engines": {
-        "node": "20.X"
+        "node": ">=20.X"
     },
     "devDependencies": {
         "@eslint/js": "^9.2.0",
@@ -29,6 +29,7 @@
         "dev": "yarn run build && yarn run start:bot"
     },
     "dependencies": {
+        "axios": "^1.7.9",
         "discord.js": "^14.15.2",
         "dotenv": "^16.4.7",
         "firebase-admin": "^12.1.1"

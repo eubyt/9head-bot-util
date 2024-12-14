@@ -38,6 +38,8 @@ export default tseslint.config(
         },
         rules: {
             '@typescript-eslint/no-extraneous-class': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
             quotes: ['error', 'single'],
             semi: ['error', 'always'],
             'no-useless-escape': 'off',

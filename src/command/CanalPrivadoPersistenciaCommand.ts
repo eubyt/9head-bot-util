@@ -2,6 +2,7 @@ import { CommandInteraction } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
+import { Logger } from '../model/Logger';
 
 export class CanalPrivadoPersistenciaCommand extends CommandCreator {
     public name = 'canalprivado-persistencia';
@@ -33,6 +34,10 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
+            void Logger.warn(
+                'CanalPrivadoPersistenciaCommand',
+                `Usuário ${userId} não tem um canal privado.`,
+            );
             return;
         }
 
@@ -68,9 +73,15 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                     'commands.canalprivado_persistencia.status_messages.persistencia_toggled',
                 )
                     .replace('{{channelName}}', privateChannelName)
-                    .replace('{{status}}', status),
+                    .replace('{{status}}', String(status)), // Garantir que status seja uma string
                 ephemeral: true,
             });
+
+            // Logando a alteração
+            Logger.info(
+                'CanalPrivadoPersistenciaCommand',
+                `Persistência do canal ${privateChannelName} alterada para: ${String(newPersistenteValue ? 'Ativada' : 'Desativada')}`,
+            ); // Garantir que o valor de persistente seja string
         } catch (error) {
             await intr.reply({
                 content: Config.getLang(
@@ -78,7 +89,10 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                 ),
                 ephemeral: true,
             });
-            console.error('Erro ao alternar persistência:', error);
+            void Logger.error(
+                'CanalPrivadoPersistenciaCommand',
+                `Erro ao alternar persistência para o usuário ${userId}: ${String(error)}`,
+            );
         }
     }
 }
