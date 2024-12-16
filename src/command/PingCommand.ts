@@ -3,7 +3,6 @@ import { CommandCreator } from './CommandBot';
 import { Loader } from '../util/Loader';
 import { Config } from '../model';
 import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
-import { ConfigData } from '../model/Config';
 
 export class PingCommand extends CommandCreator {
     public name = 'ping';
@@ -14,11 +13,8 @@ export class PingCommand extends CommandCreator {
 
     public options = [];
 
-    async execute(
-        intr: CommandInteraction,
-        configData: ConfigData | undefined,
-    ): Promise<void> {
-        Logger.info(
+    async execute(intr: CommandInteraction): Promise<void> {
+        void Logger.info(
             'PingCommand',
             `Comando ping iniciado pelo usuário ${intr.user.id}`,
         );
@@ -47,7 +43,7 @@ export class PingCommand extends CommandCreator {
 
         const PingEmbed = this.BasicEmbed(
             intr.user,
-            configData?.Embed.default ?? Config.getConfigLocal().Embed.default,
+            Config.getConfigLocal().Embed.default,
         )
             .setTitle(Config.getLang('commands.ping.title'))
             .setDescription(`\`\`\`ansi\n${description}\n\`\`\``);
@@ -58,7 +54,7 @@ export class PingCommand extends CommandCreator {
             embeds: [PingEmbed],
         });
 
-        Logger.info(
+        void Logger.info(
             'PingCommand',
             `Latência para o usuário ${intr.user.id}: roundtrip ${latency_roundtrip}ms, websocket ${websocket_heartbeat}ms`,
         );

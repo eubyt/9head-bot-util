@@ -67,18 +67,28 @@ export class SetPrivateChannelCommand extends CommandCreator {
     ];
 
     async execute(intr: CommandInteraction): Promise<void> {
-        Logger.info(
+        const userId = intr.user.id;
+
+        void Logger.info(
             'SetPrivateChannelCommand',
             `Comando setprivatevoicechannel iniciado pelo usuário ${intr.user.id}`,
         );
+
+        await intr.deferReply({ ephemeral: true });
 
         if (!(await this.validatePermissions(intr))) return;
 
         // Verificar se guildId é válido
         if (!intr.guildId) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.general_error',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.general_error',
+                ),
+                userId,
             );
             return;
         }
@@ -94,9 +104,15 @@ export class SetPrivateChannelCommand extends CommandCreator {
         }
 
         if (!canal || !categoria) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.invalid_input',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.invalid_input',
+                ),
+                userId,
             );
             return;
         }
@@ -119,23 +135,19 @@ export class SetPrivateChannelCommand extends CommandCreator {
     ): Promise<boolean> {
         const member = await intr.guild?.members.fetch(intr.user.id);
         if (!member?.permissions.has('ManageChannels')) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.no_permission',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.no_permission',
+                ),
+                intr.user.id,
             );
             return false;
         }
         return true;
-    }
-
-    private async sendErrorReply(
-        intr: CommandInteraction,
-        langKey: string,
-    ): Promise<void> {
-        await intr.reply({
-            content: Config.getLang(langKey),
-            ephemeral: true,
-        });
     }
 
     private async validateCategory(
@@ -143,18 +155,30 @@ export class SetPrivateChannelCommand extends CommandCreator {
         categoryId: string | undefined,
     ): Promise<boolean> {
         if (!categoryId) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.category_not_found',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
             );
             return false;
         }
 
         const category = intr.guild?.channels.cache.get(categoryId);
         if (!category || category.type !== ChannelType.GuildCategory) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.category_not_found',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
             );
             return false;
         }
@@ -167,9 +191,15 @@ export class SetPrivateChannelCommand extends CommandCreator {
     ): Promise<void> {
         // Verifica se guildId é válido
         if (!intr.guildId) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.general_error',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.general_error',
+                ),
+                intr.user.id,
             );
             return;
         }
@@ -180,12 +210,16 @@ export class SetPrivateChannelCommand extends CommandCreator {
         });
         Config.configCache.delete(intr.guildId);
 
-        await intr.reply({
-            content: Config.getLang(
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setprivatevoicechannel.error_messages.erro_title',
+            ),
+            Config.getLang(
                 'commands.setprivatevoicechannel.success_messages.channels_cleared',
             ),
-            ephemeral: true,
-        });
+            intr.user.id,
+        );
     }
 
     private async addPrivateChannel(
@@ -195,9 +229,15 @@ export class SetPrivateChannelCommand extends CommandCreator {
     ): Promise<void> {
         // Verifica se guildId é válido
         if (!intr.guildId) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.general_error',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.general_error',
+                ),
+                intr.user.id,
             );
             return;
         }
@@ -215,9 +255,15 @@ export class SetPrivateChannelCommand extends CommandCreator {
         );
 
         if (channelExists) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.channel_already_exists',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.channel_already_exists',
+                ),
+                intr.user.id,
             );
             return;
         }
@@ -236,12 +282,16 @@ export class SetPrivateChannelCommand extends CommandCreator {
 
         Config.configCache.delete(intr.guildId);
 
-        await intr.reply({
-            content: Config.getLang(
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setprivatevoicechannel.success_messages.sucess_title',
+            ),
+            Config.getLang(
                 'commands.setprivatevoicechannel.success_messages.channel_added',
             ).replace('{{channelName}}', categoria.name),
-            ephemeral: true,
-        });
+            intr.user.id,
+        );
     }
 
     private async removePrivateChannel(
@@ -267,10 +317,17 @@ export class SetPrivateChannelCommand extends CommandCreator {
             updatedPrivateVoiceChannel.length ===
             data.PrivateVoiceChannel.length
         ) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setprivatevoicechannel.error_messages.channel_not_found',
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setprivatevoicechannel.error_messages.channel_not_found',
+                ),
+                intr.user.id,
             );
+
             return;
         }
 
@@ -280,11 +337,15 @@ export class SetPrivateChannelCommand extends CommandCreator {
 
         Config.configCache.delete(intr.guildId);
 
-        await intr.reply({
-            content: Config.getLang(
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setprivatevoicechannel.error_messages.erro_title',
+            ),
+            Config.getLang(
                 'commands.setprivatevoicechannel.success_messages.channel_removed',
             ),
-            ephemeral: true,
-        });
+            intr.user.id,
+        );
     }
 }

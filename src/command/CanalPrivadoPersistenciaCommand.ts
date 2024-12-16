@@ -1,6 +1,5 @@
 import { CommandInteraction } from 'discord.js';
 import { CommandCreator } from './CommandBot';
-import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
 
@@ -8,7 +7,7 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
     public name = 'canalprivado-persistencia';
     public name_localizations = null;
 
-    // Mensagem da descrição usando o arquivo de configurações
+    // Descrição usando o arquivo de configurações
     public description = Config.getLang(
         'commands.canalprivado_persistencia.description',
     );
@@ -16,82 +15,113 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
 
     public options = [];
 
-    constructor(public db: Firestore) {
-        super();
-    }
-
-    async execute(intr: CommandInteraction) {
+    async execute(intr: CommandInteraction): Promise<void> {
         const userId = intr.user.id;
+        const guildId = intr.guildId;
 
-        // Verifica se o usuário tem um canal privado
-        const docRef = this.db.collection('privateVoiceChannels').doc(userId);
-        const doc = await docRef.get();
+        await intr.deferReply({ ephemeral: true });
 
-        if (!doc.exists) {
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado_persistencia.error_messages.no_private_channel',
+        if (!guildId) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
                 ),
-                ephemeral: true,
-            });
-            void Logger.warn(
-                'CanalPrivadoPersistenciaCommand',
-                `Usuário ${userId} não tem um canal privado.`,
+                Config.getLang('commands.error_messages.guild_not_found'),
+                userId,
             );
             return;
         }
 
-        const data = doc.data() as {
+        // Verifica se o usuário possui um canal privado
+        const db = Config.getGuildCollection(guildId);
+        const privateChannelDoc = await db
+            .collection('privateVoiceChannels')
+            .doc(userId)
+            .get();
+
+        if (!privateChannelDoc.exists) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.no_private_channel',
+                ),
+                userId,
+            );
+            return;
+        }
+
+        const privateChannelData = privateChannelDoc.data();
+        if (!privateChannelData) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang('commands.error_messages.data_not_found'),
+                userId,
+            );
+            return;
+        }
+
+        const { channelName, persistente } = privateChannelData as {
             channelName: string;
             permissions: string[];
             persistente: boolean;
         };
-        const privateChannelName = data.channelName;
 
-        // Toggling a persistência do canal
+        const newPersistenteValue = !persistente;
         try {
-            const isPersistente = data.persistente || false; // Se não tiver, assume false
-
-            // Alterna o valor de persistente
-            const newPersistenteValue = !isPersistente;
-
-            // Atualizando a persistência no Firestore
-            await docRef.update({
+            await privateChannelDoc.ref.update({
                 persistente: newPersistenteValue,
             });
 
-            const status = newPersistenteValue
+            const statusMessage = newPersistenteValue
                 ? Config.getLang(
-                      'commands.canalprivado_persistencia.status_messages.persistencia_ativada',
+                      'commands.canalprivado_persistencia.persistencia_ativada',
                   )
                 : Config.getLang(
-                      'commands.canalprivado_persistencia.status_messages.persistencia_desativada',
+                      'commands.canalprivado_persistencia.persistencia_desativada',
                   );
 
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado_persistencia.status_messages.persistencia_toggled',
-                )
-                    .replace('{{channelName}}', privateChannelName)
-                    .replace('{{status}}', String(status)), // Garantir que status seja uma string
-                ephemeral: true,
-            });
+            const description = Config.getLang(
+                'commands.canalprivado_persistencia.success_messages.persistencia_toggled',
+            )
+                .replace('{{channelName}}', channelName)
+                .replace('{{status}}', statusMessage);
 
-            // Logando a alteração
-            Logger.info(
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.success_messages.sucess_title',
+                ),
+                description,
+                userId,
+            );
+
+            void Logger.info(
                 'CanalPrivadoPersistenciaCommand',
-                `Persistência do canal ${privateChannelName} alterada para: ${String(newPersistenteValue ? 'Ativada' : 'Desativada')}`,
-            ); // Garantir que o valor de persistente seja string
+                `Persistência do canal ${channelName} alterada para: ${statusMessage}`,
+            );
         } catch (error) {
-            await intr.reply({
-                content: Config.getLang(
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_persistencia.error_messages.persistencia_error',
                 ),
-                ephemeral: true,
-            });
+                userId,
+            );
             void Logger.error(
                 'CanalPrivadoPersistenciaCommand',
-                `Erro ao alternar persistência para o usuário ${userId}: ${String(error)}`,
+                `Erro ao alterar persistência do canal ${channelName}: ${String(
+                    error,
+                )}`,
             );
         }
     }

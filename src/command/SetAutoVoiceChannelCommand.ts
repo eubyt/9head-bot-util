@@ -1,4 +1,4 @@
-import { ChannelType, CommandInteraction } from 'discord.js';
+import { ChannelType, CommandInteraction, GuildBasedChannel } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
@@ -15,7 +15,7 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
 
     public options = [
         {
-            type: 3, // Tipo STRING para o campo de escolha (add ou remove)
+            type: 3,
             name: 'comando',
             description: Config.getLang(
                 'commands.setautovoicechannel.actions.description',
@@ -43,16 +43,16 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
             ],
         },
         {
-            type: 7, // Tipo CHANNEL para selecionar categorias
+            type: 7,
             name: 'categoria',
             description: Config.getLang(
                 'commands.setautovoicechannel.select_channel.description',
             ),
             required: false,
-            channel_types: [4], // Categoria de canal
+            channel_types: [4],
         },
         {
-            type: 3, // Tipo STRING para permitir um nome customizado
+            type: 3,
             name: 'nome',
             description: Config.getLang(
                 'commands.setautovoicechannel.select_channel.description',
@@ -62,137 +62,65 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
     ];
 
     async execute(intr: CommandInteraction): Promise<void> {
-        Logger.info(
+        const userId = intr.user.id;
+
+        void Logger.info(
             'SetAutoVoiceChannelCommand',
-            `Comando setautovoicechannel iniciado pelo usuário ${intr.user.id}`,
+            `Comando iniciado pelo usuário ${userId}`,
         );
+
+        await intr.deferReply({ ephemeral: true });
 
         if (!(await this.validatePermissions(intr))) return;
 
-        // Verificar se guildId é válido
         if (!intr.guildId) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setautovoicechannel.error_messages.general_error',
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.general_error',
+                ),
+                userId,
             );
             return;
         }
 
-        const subcommand = intr.options.get('comando', true);
-        const categoria = intr.options.get('categoria');
-        const customName = intr.options.get('nome')?.value as string; // Nome customizado
+        const guildId = intr.guildId;
 
-        if (subcommand.value === 'clear') {
-            await this.clearAutoVoiceChannels(intr);
-            return;
-        }
+        const subcommand = intr.options.get('comando', true).value as string;
+        const categoria = intr.options.get('categoria')
+            ?.channel as GuildBasedChannel;
+        const customName = intr.options.get('nome')?.value as string;
 
-        if (!categoria) {
-            await this.sendErrorReply(
-                intr,
-                'commands.setautovoicechannel.error_messages.invalid_input',
-            );
-            return;
-        }
-
-        const categoryId = categoria.channel?.id;
-
-        if (!categoryId) {
-            await this.sendErrorReply(
-                intr,
-                'commands.setautovoicechannel.error_messages.category_not_found',
-            );
-            return;
-        }
-
-        const db = Config.getGuildCollection(intr.guildId);
-        const doc = await db.get();
-        const data = doc.data() as ConfigData;
-
-        // Verificar se a categoria existe
-        const category = intr.guild?.channels.cache.get(categoryId);
-
-        if (!category || category.type !== ChannelType.GuildCategory) {
-            await this.sendErrorReply(
-                intr,
-                'commands.setautovoicechannel.error_messages.category_not_found',
-            );
-            return;
-        }
-
-        // Processar comando add ou remove
-        switch (subcommand.value) {
-            case 'add': {
-                // Verificar se a categoria já está na lista
-                const categoryExists = data.AutoVoiceChannel.some(
-                    (item) => item.categoryId === categoryId,
-                );
-
-                if (categoryExists) {
-                    await this.sendErrorReply(
-                        intr,
-                        'commands.setautovoicechannel.error_messages.category_already_exists',
-                    );
-                    return;
-                }
-
-                // Adicionar a categoria ao AutoVoiceChannel
-                const newAutoVoiceChannel = {
-                    name: customName || '🔊│Sala ─ #{number}',
-                    categoryId: categoryId,
-                };
-
-                // Atualizar o Firebase
-                await db.update({
-                    AutoVoiceChannel: [
-                        ...data.AutoVoiceChannel,
-                        newAutoVoiceChannel,
-                    ],
-                });
-
-                Config.configCache.delete(intr.guildId);
-
-                await intr.reply({
-                    content: Config.getLang(
-                        'commands.setautovoicechannel.success_messages.category_added',
-                    ).replace('{{categoryName}}', category.name),
-                    ephemeral: true,
-                });
+        switch (subcommand) {
+            case 'clear':
+                await this.clearAutoVoiceChannels(intr, guildId);
                 break;
-            }
-
-            case 'remove': {
-                // Remover a categoria do AutoVoiceChannel
-                const updatedAutoVoiceChannel = data.AutoVoiceChannel.filter(
-                    (item) => item.categoryId !== categoryId,
+            case 'add':
+                await this.addAutoVoiceChannel(
+                    intr,
+                    guildId,
+                    categoria,
+                    customName,
                 );
-
-                if (
-                    updatedAutoVoiceChannel.length ===
-                    data.AutoVoiceChannel.length
-                ) {
-                    await this.sendErrorReply(
-                        intr,
-                        'commands.setautovoicechannel.error_messages.category_not_found',
-                    );
-                    return;
-                }
-
-                // Atualizar o Firebase
-                await db.update({
-                    AutoVoiceChannel: updatedAutoVoiceChannel,
-                });
-
-                Config.configCache.delete(intr.guildId);
-
-                await intr.reply({
-                    content: Config.getLang(
-                        'commands.setautovoicechannel.success_messages.category_removed',
-                    ).replace('{{categoryName}}', category.name),
-                    ephemeral: true,
-                });
                 break;
-            }
+            case 'remove':
+                await this.removeAutoVoiceChannel(intr, guildId, categoria);
+                break;
+            default:
+                await this.sendEmbed(
+                    intr,
+                    Config.getLang(
+                        'commands.setautovoicechannel.error_messages.erro_title',
+                    ),
+                    Config.getLang(
+                        'commands.setautovoicechannel.error_messages.invalid_command',
+                    ),
+                    userId,
+                );
+                break;
         }
     }
 
@@ -201,48 +129,209 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
     ): Promise<boolean> {
         const member = await intr.guild?.members.fetch(intr.user.id);
         if (!member?.permissions.has('ManageChannels')) {
-            await this.sendErrorReply(
+            await this.sendEmbed(
                 intr,
-                'commands.setautovoicechannel.error_messages.no_permission',
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.no_permission',
+                ),
+                member?.id ?? 'N/A',
             );
             return false;
         }
         return true;
     }
 
-    private async sendErrorReply(
-        intr: CommandInteraction,
-        langKey: string,
-    ): Promise<void> {
-        await intr.reply({
-            content: Config.getLang(langKey),
-            ephemeral: true,
-        });
-    }
-
     private async clearAutoVoiceChannels(
         intr: CommandInteraction,
+        guildId: string,
     ): Promise<void> {
-        // Verifica se guildId é válido
-        if (!intr.guildId) {
-            await this.sendErrorReply(
+        const db = Config.getGuildCollection(guildId);
+        await db.update({ AutoVoiceChannel: [] });
+        Config.configCache.delete(guildId);
+
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.sucess_title',
+            ),
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.channels_cleared',
+            ),
+            intr.user.id,
+        );
+    }
+
+    private async addAutoVoiceChannel(
+        intr: CommandInteraction,
+        guildId: string,
+        categoria: GuildBasedChannel | undefined,
+        customName: string | undefined,
+    ): Promise<void> {
+        if (!categoria) {
+            await this.sendEmbed(
                 intr,
-                'commands.setautovoicechannel.error_messages.general_error',
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.invalid_input',
+                ),
+                intr.user.id,
             );
             return;
         }
 
-        const db = Config.getGuildCollection(intr.guildId);
-        await db.update({
-            AutoVoiceChannel: [],
-        });
-        Config.configCache.delete(intr.guildId);
+        const categoryId = categoria.id;
 
-        await intr.reply({
-            content: Config.getLang(
-                'commands.setautovoicechannel.success_messages.channels_cleared',
-            ),
-            ephemeral: true,
+        if (!categoryId) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        const db = Config.getGuildCollection(guildId);
+        const doc = await db.get();
+        const data = doc.data() as ConfigData;
+
+        const category = intr.guild?.channels.cache.get(categoryId);
+
+        if (!category || category.type !== ChannelType.GuildCategory) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        const categoryExists = data.AutoVoiceChannel.some(
+            (item) => item.categoryId === categoryId,
+        );
+
+        if (categoryExists) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.category_already_exists',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        const newAutoVoiceChannel = {
+            name: customName ?? '🔊│Sala ─ #{number}',
+            categoryId,
+        };
+
+        await db.update({
+            AutoVoiceChannel: [...data.AutoVoiceChannel, newAutoVoiceChannel],
         });
+
+        Config.configCache.delete(guildId);
+
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.sucess_title',
+            ),
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.category_added',
+            ).replace('{{categoryName}}', category.name),
+            intr.user.id,
+        );
+    }
+
+    private async removeAutoVoiceChannel(
+        intr: CommandInteraction,
+        guildId: string,
+        categoria: GuildBasedChannel | undefined,
+    ): Promise<void> {
+        if (!categoria) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.invalid_input',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        const categoryId = categoria.id;
+
+        if (!categoryId) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        const db = Config.getGuildCollection(guildId);
+        const doc = await db.get();
+        const data = doc.data() as ConfigData;
+
+        const updatedAutoVoiceChannel = data.AutoVoiceChannel.filter(
+            (item) => item.categoryId !== categoryId,
+        );
+
+        if (updatedAutoVoiceChannel.length === data.AutoVoiceChannel.length) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.erro_title',
+                ),
+                Config.getLang(
+                    'commands.setautovoicechannel.error_messages.category_not_found',
+                ),
+                intr.user.id,
+            );
+            return;
+        }
+
+        await db.update({ AutoVoiceChannel: updatedAutoVoiceChannel });
+        Config.configCache.delete(guildId);
+
+        const category = intr.guild?.channels.cache.get(categoryId);
+
+        await this.sendEmbed(
+            intr,
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.sucess_title',
+            ),
+            Config.getLang(
+                'commands.setautovoicechannel.success_messages.category_removed',
+            ).replace('{{categoryName}}', category?.name ?? 'Unknown'),
+            intr.user.id,
+        );
     }
 }

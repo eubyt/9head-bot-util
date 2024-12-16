@@ -1,17 +1,5 @@
 {
     "Discord_User_ID_DEV": [],
-    "AutoVoiceChannel": [
-        {
-            "name": "🔊│Sala ─ #{number}",
-            "categoryId": "1109809831784751104"
-        }
-    ],
-    "PrivateVoiceChannel": [
-        {
-            "channelId": "1317493394150395964",
-            "categoryId": "1317493328903671848"
-        }
-    ],
     "Embed": {
         "default": "#2B2D31"
     }

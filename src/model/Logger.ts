@@ -29,7 +29,9 @@ export class Logger {
             // Envia o payload para o webhook
             await axios.post(Logger.webhookUrl, payload);
         } catch (error) {
-            console.error('Erro ao enviar log para o webhook:', error);
+            console.error(
+                'Erro ao enviar log para o webhook. Talvez limite atingido',
+            );
         }
     }
 
@@ -62,11 +64,16 @@ export class Logger {
     }
 
     // Função para logar com nível 'info'
-    public static info(event: string, description: string): void {
+    public static async info(
+        event: string,
+        description: string,
+    ): Promise<void> {
         const message = Logger.createLogMessage('INFO', event, description);
 
         // Exibe no console
         Logger.logToConsole('INFO', message);
+
+        await Logger.sendLog({ content: message });
     }
 
     // Função para logar com nível 'warn'

@@ -5,6 +5,7 @@
             "title": ":ping_pong:   Teste de latência",
             "description": "「Discord」 Verificar a latência do bot."
         },
+
         "canalprivado": {
             "description": "「Canal Privado」 Gerencie o seu canal de voz privado.",
             "actions": {
@@ -17,30 +18,38 @@
             "add_user": {
                 "description": "Usuário que você deseja adicionar/remover."
             },
+            "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
+                "user_added": "Usuário <@{{userId}}> adicionado ao seu canal privado com sucesso!",
+                "user_removed": "Usuário <@{{userId}}> removido do seu canal privado com sucesso!"
+            },
             "error_messages": {
+                "erro_title": "Ocorreu um erro",
                 "user_invalid": "Usuário inválido.",
                 "bot_invalid": "Você só pode adicionar ou remover usuários.",
                 "self_invalid": "Você não pode adicionar ou remover a si mesmo.",
                 "no_channel": "Você não tem um canal privado.",
-                "user_added": "Usuário <@{{userId}}> adicionado ao canal privado com sucesso!",
                 "user_already_added": "Usuário <@{{userId}}> já está autorizado a acessar o canal privado!",
-                "user_removed": "Usuário <@{{userId}}> removido do canal privado com sucesso!",
                 "user_not_authorized": "Usuário <@{{userId}}> não está autorizado a acessar o canal privado!",
                 "invalid_command": "Comando inválido."
             }
         },
+
         "canalprivado_persistencia": {
             "description": "「Canal Privado」 Alterna a persistência do seu canal privado (liga/desliga).",
+            "persistencia_ativada": "ativado",
+            "persistencia_desativada": "desativado",
+            "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
+                "persistencia_toggled": "A persistência do canal `{{channelName}}` foi {{status}}."
+            },
             "error_messages": {
+                "erro_title": "Ocorreu um erro",
                 "no_private_channel": "Você não possui um canal privado.",
                 "persistencia_error": "Não foi possível alternar a persistência para o canal."
-            },
-            "status_messages": {
-                "persistencia_toggled": "A persistência do canal `{{channelName}}` foi {{status}}.",
-                "persistencia_ativada": "ativado",
-                "persistencia_desativada": "desativado"
             }
         },
+
         "canalprivado_rename": {
             "description": "「Canal Privado」 Trocar o nome do seu canal privado.",
             "options": {
@@ -48,17 +57,22 @@
                     "description": "Digite o nome do seu canal"
                 }
             },
+            "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
+                "channel_rename_success": "O nome do canal foi alterado para  `{{newName}}`. O canal antigo foi deletado."
+            },
             "error_messages": {
+                "erro_title": "Ocorreu um erro",
                 "channel_name_too_long": "O nome do canal não pode exceder 32 caracteres.",
                 "no_private_channel": "Você não tem um canal privado.",
                 "channel_not_found": "Não consegui encontrar o seu canal privado. Certifique-se de estar no canal correto.",
                 "no_manage_permission": "Eu não tenho permissão para alterar o nome do canal. Por favor, verifique minhas permissões.",
                 "channel_exists_in_server": "Já existe um canal com este nome no servidor. Escolha um nome diferente.",
                 "channel_exists_in_firestore": "Já existe um canal com este nome. Escolha um nome diferente.",
-                "failed_to_create_channel": "Não foi possível criar o novo canal. Tente novamente mais tarde.",
-                "channel_rename_success": "O nome do canal foi alterado para  `{{newName}}`. O canal antigo foi deletado."
+                "failed_to_create_channel": "Não foi possível criar o novo canal. Tente novamente mais tarde."
             }
         },
+
         "setautovoicechannel": {
             "actions": {
                 "description": "Configura o canal de voz automático para um servidor.",
@@ -72,6 +86,7 @@
                 "description": "Selecione uma categoria de canal onde os canais automáticos serão criados."
             },
             "error_messages": {
+                "erro_title": "Ocorreu um erro",
                 "no_permission": "Você não tem permissão para gerenciar canais.",
                 "general_error": "Ocorreu um erro ao tentar configurar o canal de voz automático.",
                 "category_not_found": "Categoria não encontrada ou não válida.",
@@ -79,11 +94,13 @@
                 "invalid_input": "Por favor, forneça uma categoria válida para o canal de voz automático."
             },
             "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
                 "category_added": "Categoria {{categoryName}} adicionada com sucesso aos canais automáticos.",
                 "category_removed": "Categoria {{categoryName}} removida com sucesso dos canais automáticos.",
                 "channels_cleared": "Todos os canais automáticos foram limpos com sucesso."
             }
         },
+
         "setprivatevoicechannel": {
             "actions": {
                 "description": "Configurar canais de voz privados para o servidor.",
@@ -97,6 +114,7 @@
                 "description": "Selecione uma categoria e um canal de voz para configurar."
             },
             "error_messages": {
+                "erro_title": "Ocorreu um erro",
                 "general_error": "Ocorreu um erro ao tentar processar o comando.",
                 "no_permission": "Você não tem permissão para gerenciar canais.",
                 "category_not_found": "Categoria não encontrada. Certifique-se de selecionar uma categoria válida.",
@@ -105,6 +123,7 @@
                 "channel_not_found": "O canal de voz não foi encontrado para ser removido."
             },
             "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
                 "channels_cleared": "Todos os canais de voz privados foram removidos com sucesso.",
                 "channel_added": "Canal de voz privado adicionado com sucesso na categoria {{channelName}}.",
                 "channel_removed": "Canal de voz privado removido com sucesso."

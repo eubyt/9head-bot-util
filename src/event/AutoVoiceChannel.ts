@@ -39,7 +39,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             );
 
             if (emptyChannels.size > 0) {
-                Logger.info(
+                void Logger.info(
                     'AutoVoiceChannel',
                     `Canais vazios encontrados: ${emptyChannels.map((x) => x.name).join(', ')}`,
                 );
@@ -47,7 +47,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
-                Logger.info(
+                void Logger.info(
                     'AutoVoiceChannel',
                     `Criando novo canal: ${channelName}`,
                 );
@@ -60,7 +60,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     bitrate: channel.guild.maximumBitrate,
                 });
 
-                Logger.info(
+                void Logger.info(
                     'AutoVoiceChannel',
                     `Canal criado com sucesso: ${channelName}`,
                 );
@@ -83,14 +83,14 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
-                Logger.info(
+                void Logger.info(
                     'AutoVoiceChannel',
                     `Tentando deletar o canal vazio: ${deleteChannel.name}`,
                 );
 
                 await deleteChannel.delete();
 
-                Logger.info(
+                void Logger.info(
                     'AutoVoiceChannel',
                     `Canal deletado com sucesso: ${deleteChannel.name}`,
                 );

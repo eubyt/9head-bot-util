@@ -5,7 +5,7 @@ import {
     LocalizationMap,
     User,
 } from 'discord.js';
-import { ConfigData } from '../model/Config';
+import { Config, ConfigData } from '../model/Config';
 
 export interface CommandName {
     name: string;
@@ -45,6 +45,33 @@ export abstract class CommandCreator implements CommandBot {
         intr: CommandInteraction,
         configData: ConfigData | undefined,
     ): Promise<void>;
+
+    public async sendEmbed(
+        intr: CommandInteraction,
+        title: string,
+        description: string,
+        footerText: string,
+        userId?: string,
+    ): Promise<void> {
+        let colorEmbed = Config.getConfigLocal().Embed.default;
+
+        if (intr.guildId) {
+            const guildConfig = await Config.getConfig(intr.guildId);
+            colorEmbed = guildConfig?.Embed.default ?? colorEmbed;
+        }
+
+        const embed = this.BasicEmbed(intr.user, colorEmbed)
+            .setTitle(title)
+            .setDescription(description)
+            .setFooter({
+                text: `${footerText} ${userId ?? ''}`,
+                iconURL: intr.user.avatarURL()?.toString(),
+            });
+
+        await intr.editReply({
+            embeds: [embed],
+        });
+    }
 
     public BasicEmbed(user: User, color: ColorResolvable) {
         return new EmbedBuilder()

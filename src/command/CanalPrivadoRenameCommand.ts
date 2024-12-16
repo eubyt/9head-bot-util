@@ -5,9 +5,8 @@ import {
     GuildMember,
 } from 'discord.js';
 import { CommandCreator } from './CommandBot';
-import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
-import { Logger } from '../model/Logger'; // Supondo que o Logger seja importado de um arquivo
+import { Logger } from '../model/Logger';
 
 export class CanalPrivadoRenameCommand extends CommandCreator {
     public name = 'canalprivado-rename';
@@ -29,61 +28,110 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         },
     ];
 
-    constructor(public db: Firestore) {
-        super();
+    /**
+     * Função para verificar se o nome do canal excede o limite de caracteres.
+     */
+    private isValidChannelName(name: string): boolean {
+        return name.length <= 32;
     }
 
-    async execute(intr: CommandInteraction) {
+    /**
+     * Função para verificar se o bot tem permissão para gerenciar o canal.
+     */
+    private hasManageChannelsPermission(
+        channel: VoiceChannel,
+        botMember: GuildMember,
+    ): boolean {
+        return channel.permissionsFor(botMember).has('ManageChannels');
+    }
+
+    /**
+     * Função para obter o documento do canal privado no Firestore.
+     */
+    private async getPrivateChannelDoc(
+        db: FirebaseFirestore.DocumentReference,
+        userId: string,
+    ) {
+        const docRef = db.collection('privateVoiceChannels').doc(userId);
+        const doc = await docRef.get();
+        return doc.exists ? doc.data() : null;
+    }
+
+    /**
+     * Função principal que executa o comando de renomear o canal privado.
+     */
+    async execute(intr: CommandInteraction): Promise<void> {
+        const newName = intr.options.get('nome', true).value as string;
+        const userId = intr.user.id;
+
         await intr.deferReply({ ephemeral: true });
 
-        const newName = intr.options.get('nome', true).value as string;
-        Logger.info(
+        void Logger.info(
             'CanalPrivadoRenameCommand',
             `Novo nome recebido: ${newName}`,
         );
 
-        if (newName.length > 32) {
+        // Verifica se o nome do canal é válido
+        if (!this.isValidChannelName(newName)) {
             void Logger.warn(
                 'CanalPrivadoRenameCommand',
                 'Nome do canal excedeu o limite de 32 caracteres.',
             );
-            await intr.editReply({
-                content: Config.getLang(
+
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.channel_name_too_long',
                 ),
+                userId,
+            );
+            return;
+        }
+
+        const guildId = intr.guildId;
+        if (!intr.guild || !guildId) {
+            await intr.editReply({
+                content: 'Guild ID não encontrado.',
             });
             return;
         }
 
-        const docRef = this.db
-            .collection('privateVoiceChannels')
-            .doc(intr.user.id);
-        const doc = await docRef.get();
+        const db = Config.getGuildCollection(guildId);
+        const privateChannelDoc = await this.getPrivateChannelDoc(
+            db,
+            intr.user.id,
+        );
 
-        if (!doc.exists) {
+        if (!privateChannelDoc) {
             void Logger.warn(
                 'CanalPrivadoRenameCommand',
                 `Usuário ${intr.user.id} não tem um canal privado.`,
             );
-            await intr.editReply({
-                content: Config.getLang(
+
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.no_private_channel',
                 ),
-            });
+                userId,
+            );
             return;
         }
 
-        const data = doc.data() as {
-            channelName: string;
-            permissions: string[];
-        };
-        const privateChannelName = data.channelName;
-        Logger.info(
+        const privateChannelName = privateChannelDoc.channelName as string;
+        void Logger.info(
             'CanalPrivadoRenameCommand',
             `Nome do canal privado no Firestore: ${privateChannelName}`,
         );
 
-        const channel = intr.guild?.channels.cache.find(
+        // Verifica se o canal privado existe no servidor
+        const channel = intr.guild.channels.cache.find(
             (ch) =>
                 ch.name === privateChannelName &&
                 ch.type === ChannelType.GuildVoice,
@@ -94,31 +142,43 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 'CanalPrivadoRenameCommand',
                 `Canal ${privateChannelName} não encontrado no servidor.`,
             );
-            await intr.editReply({
-                content: Config.getLang(
+
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.channel_not_found',
                 ),
-            });
+                userId,
+            );
             return;
         }
 
-        const botMember = intr.guild?.members.me;
+        const botMember = intr.guild.members.me;
         if (
             !botMember ||
-            !channel.permissionsFor(botMember).has('ManageChannels')
+            !this.hasManageChannelsPermission(channel, botMember)
         ) {
             void Logger.warn(
                 'CanalPrivadoRenameCommand',
                 'Bot não tem permissão para gerenciar o canal.',
             );
-            await intr.editReply({
-                content: Config.getLang(
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.no_manage_permission',
                 ),
-            });
+                userId,
+            );
             return;
         }
 
+        // Verifica se já existe um canal com o novo nome no servidor
         const existingChannel = intr.guild.channels.cache.find(
             (ch) =>
                 ch.name.toLowerCase() === newName.toLowerCase() &&
@@ -130,15 +190,22 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no servidor.`,
             );
-            await intr.editReply({
-                content: Config.getLang(
+
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.channel_exists_in_server',
                 ),
-            });
+                userId,
+            );
             return;
         }
 
-        const existingChannelQuery = await this.db
+        // Verifica se já existe um canal com o novo nome no Firestore
+        const existingChannelQuery = await db
             .collection('privateVoiceChannels')
             .where('channelName', '==', newName)
             .get();
@@ -148,19 +215,40 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no Firestore.`,
             );
-            await intr.editReply({
-                content: Config.getLang(
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.channel_exists_in_firestore',
                 ),
-            });
+                userId,
+            );
             return;
         }
 
         try {
-            Logger.info(
+            void Logger.info(
                 'CanalPrivadoRenameCommand',
                 `Criando novo canal com o nome ${newName}...`,
             );
+
+            const channelPermissions = channel.permissionOverwrites.cache;
+            for (const { id } of channelPermissions.values()) {
+                try {
+                    const user = await intr.guild.members
+                        .fetch(id)
+                        .catch(() => null);
+
+                    if (!user) {
+                        channelPermissions.delete(id);
+                    }
+                } catch {
+                    channelPermissions.delete(id);
+                }
+            }
+
             const newChannel = await intr.guild.channels.create({
                 name: newName,
                 type: ChannelType.GuildVoice,
@@ -176,50 +264,62 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 ),
             });
 
-            Logger.info(
+            void Logger.info(
                 'CanalPrivadoRenameCommand',
                 `Novo canal criado com o nome ${newName}.`,
             );
 
-            const members = channel.members;
-            const movePromises = members.map((member: GuildMember) =>
+            // Move os membros para o novo canal
+            const movePromises = channel.members.map((member: GuildMember) =>
                 member.voice.setChannel(newChannel),
             );
-
             await Promise.all(movePromises);
-            Logger.info(
+            void Logger.info(
                 'CanalPrivadoRenameCommand',
                 'Todos os membros foram movidos para o novo canal.',
             );
 
-            if (!channel.deletable) {
+            // Deleta o canal antigo, se possível
+            if (channel.deletable) {
                 await channel.delete();
-                Logger.info(
+                void Logger.info(
                     'CanalPrivadoRenameCommand',
                     `Canal antigo ${privateChannelName} deletado.`,
                 );
             }
 
-            await docRef.update({
-                channelName: newChannel.name,
-            });
+            // Atualiza o nome do canal no Firestore
+            await db
+                .collection('privateVoiceChannels')
+                .doc(intr.user.id)
+                .update({ channelName: newChannel.name });
 
-            await intr.editReply({
-                content: Config.getLang(
-                    'commands.canalprivado_rename.error_messages.channel_rename_success',
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.success_messages.sucess_title',
+                ),
+                Config.getLang(
+                    'commands.canalprivado_rename.success_messages.channel_rename_success',
                 ).replace('{{newName}}', newName),
-            });
+                userId,
+            );
         } catch (error) {
             void Logger.error(
                 'CanalPrivadoRenameCommand',
                 `Erro ao tentar alterar o nome do canal: ${String(error)}`,
             );
 
-            await intr.editReply({
-                content: Config.getLang(
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado_persistencia.error_messages.erro_title',
+                ),
+                Config.getLang(
                     'commands.canalprivado_rename.error_messages.failed_to_create_channel',
                 ),
-            });
+                userId,
+            );
         }
     }
 }

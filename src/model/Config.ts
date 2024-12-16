@@ -52,11 +52,17 @@ export class Config {
             void Logger.error('Config Validation', errorMessage);
             return;
         }
-        Logger.info('Config Validation', `NODE_ENV set to: ${this.NODE_ENV}`);
+        void Logger.info(
+            'Config Validation',
+            `NODE_ENV set to: ${this.NODE_ENV}`,
+        );
     }
 
     private loadConfig() {
-        Logger.info('Config Loading', `Loading ${this.NODE_ENV} config....`);
+        void Logger.info(
+            'Config Loading',
+            `Loading ${this.NODE_ENV} config....`,
+        );
 
         try {
             const configLoader = Loader.JSON(
@@ -70,7 +76,7 @@ export class Config {
 
             Config.setConfig(configLoader);
 
-            Logger.info(
+            void Logger.info(
                 'Config Loading',
                 'Configuração carregada com sucesso.',
             );
@@ -141,7 +147,7 @@ export class Config {
             await guildConfigRef.set(defaultConfig);
             guildConfig = defaultConfig;
 
-            Logger.info(
+            void Logger.info(
                 'Guild Config Creation',
                 `Configuração criada para a guild ${guildId}`,
             );
@@ -164,7 +170,7 @@ export class Config {
                 });
 
                 await guildConfigRef.set(guildConfig);
-                Logger.info(
+                void Logger.info(
                     'Guild Config Update',
                     `Configuração atualizada para a guild ${guildId}. Campos ausentes adicionados: ${missingFields.join(
                         ', ',
@@ -187,7 +193,7 @@ export class Config {
         if (Object.keys(this._language[lang]).length === 0) {
             try {
                 const langData = Loader.JSON(`../lang/${lang}.json`);
-                Logger.info(
+                void Logger.info(
                     'Lang Loading',
                     `Idioma ${lang} carregado com sucesso.`,
                 );

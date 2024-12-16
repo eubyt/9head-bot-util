@@ -56,7 +56,7 @@ export class DiscordBot {
             await client.login(
                 token ?? Config.getConfigLocal().Config_Discord_BOT.token,
             );
-            Logger.info('Bot Login', 'Bot logged in successfully');
+            void Logger.info('Bot Login', 'Bot logged in successfully');
         } catch (err: unknown) {
             this.handleError('Bot Login', err);
         }
@@ -71,13 +71,7 @@ export class DiscordBot {
             intr instanceof AutocompleteInteraction
         ) {
             try {
-                const configGuild = undefined;
-
-                // if (intr.guildId) {
-                //     configGuild = await Config.getConfig(intr.guildId);
-                // }
-
-                await commandHandle.execute(intr, configGuild);
+                await commandHandle.execute(intr);
             } catch (err: unknown) {
                 this.handleError('Interaction Error', err);
             }
@@ -93,7 +87,7 @@ export class DiscordBot {
         if (privateVoiceChannel) {
             try {
                 await privateVoiceChannel.execute(oldState, newState);
-                Logger.info(
+                void Logger.info(
                     'Voice State Update',
                     'Executed private voice channel update',
                 );
@@ -107,7 +101,7 @@ export class DiscordBot {
         if (autoVoiceChannel) {
             try {
                 await autoVoiceChannel.execute(oldState, newState);
-                Logger.info(
+                void Logger.info(
                     'Voice State Update',
                     'Executed auto voice channel update',
                 );
@@ -122,11 +116,10 @@ export class DiscordBot {
         const { client } = this.data_bot;
 
         client.guilds.cache.forEach((guild) => {
-            console.log(guild.id);
             void Config.checkAndCreateGuildConfig(guild.id);
         });
 
-        Logger.info('Bot Ready', 'Client is ready');
+        void Logger.info('Bot Ready', 'Client is ready');
     }
 
     // Centralização do tratamento de erro

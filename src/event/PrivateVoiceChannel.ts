@@ -5,8 +5,8 @@ import {
     VoiceBasedChannel,
     Guild,
     OverwriteResolvable,
+    PermissionResolvable,
 } from 'discord.js';
-import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
 import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
 
@@ -17,19 +17,14 @@ interface VoiceChannelData {
 }
 
 export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
-    constructor(
-        public categoryId: {
-            categoryId: string;
-            channelId: string;
-        }[],
-        public db: Firestore,
-    ) {}
-
     async execute(oldState: VoiceState, newState: VoiceState) {
+        const config = await Config.getConfig(newState.guild.id);
+        if (config === undefined) return;
+
         const channel = newState.channel ?? oldState.channel;
         if (!channel?.parentId) return;
 
-        const { categoryId, channelId } = this.categoryId.find(
+        const { categoryId, channelId } = config.PrivateVoiceChannel.find(
             (x) =>
                 x.channelId === channel.id ||
                 x.categoryId === oldState.channel?.parentId,
@@ -49,10 +44,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         }
 
         // Modificação: A coleção é agora identificada pelo ID do servidor (guild)
-        const guildId = guild.id;
-        const docRef = this.db
-            .collection('guilds')
-            .doc(guildId)
+        const docRef = Config.getGuildCollection(guild.id)
             .collection('privateVoiceChannels')
             .doc(userId);
         const doc = await docRef.get();
@@ -65,7 +57,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             if (doc.exists) {
                 const data = doc.data() as VoiceChannelData;
                 if (data.persistente) {
-                    Logger.info(
+                    void Logger.info(
                         'PrivateVoiceChannel',
                         `O canal de ${userId} é persistente.`,
                     );
@@ -74,11 +66,11 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
-                await oldState.channel.delete();
-                Logger.info(
+                void Logger.info(
                     'PrivateVoiceChannel',
                     `Canal de voz removido com sucesso: ${oldState.channel.name}`,
                 );
+                await oldState.channel.delete();
             } catch (error) {
                 void Logger.error(
                     'PrivateVoiceChannel',
@@ -97,7 +89,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
 
-                    Logger.info(
+                    void Logger.info(
                         'PrivateVoiceChannel',
                         `Canal encontrado: ${channelName}`,
                     );
@@ -117,28 +109,45 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
 
                 if (existingChannel) {
                     await newState.member.voice.setChannel(existingChannel);
-                    Logger.info(
+                    void Logger.info(
                         'PrivateVoiceChannel',
                         `Usuário ${userId} movido para o canal existente: ${existingChannel.name}`,
                     );
                     return;
                 }
 
-                const permissionOverwrites = allowedUsers.map((id) => ({
-                    id: id,
-                    allow: ['ViewChannel', 'Connect'],
-                })) as OverwriteResolvable[];
+                for (const userId of allowedUsers) {
+                    const user = await guild.members
+                        .fetch(userId)
+                        .catch(() => null);
 
-                permissionOverwrites.push({
-                    id: guild.roles.everyone.id,
-                    allow: ['ViewChannel'],
-                    deny: ['Connect'],
-                });
+                    if (!user) {
+                        void Logger.warn(
+                            'PrivateVoiceChannel',
+                            `Usuário com ID ${userId} não encontrado no servidor.`,
+                        );
+                        allowedUsers = allowedUsers.filter((x) => x !== userId);
+                    }
+                }
 
-                permissionOverwrites.push({
-                    id: Config.getConfigLocal().Config_Discord_BOT.id,
-                    allow: ['ViewChannel', 'ManageChannels', 'MoveMembers'],
-                });
+                const permissionOverwrites: OverwriteResolvable[] = [
+                    ...allowedUsers.map((id) => ({
+                        id,
+                        allow: ['ViewChannel'] as PermissionResolvable[],
+                    })),
+                    {
+                        id: guild.roles.everyone.id,
+                        deny: ['ViewChannel'] as PermissionResolvable[],
+                    },
+                    {
+                        id: Config.getConfigLocal().Config_Discord_BOT.id,
+                        allow: [
+                            'ViewChannel',
+                            'ManageChannels',
+                            'MoveMembers',
+                        ] as PermissionResolvable[],
+                    },
+                ];
 
                 // Criar o canal de voz
                 const newChannel = await guild.channels.create({
@@ -146,12 +155,12 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     parent: categoryId,
                     type: ChannelType.GuildVoice,
                     userLimit: 10,
-                    permissionOverwrites,
+                    permissionOverwrites: permissionOverwrites,
                     bitrate: channel.guild.maximumBitrate,
                 });
 
                 await newState.member.voice.setChannel(newChannel);
-                Logger.info(
+                void Logger.info(
                     'PrivateVoiceChannel',
                     `Canal de voz criado com sucesso: ${newChannel.name}`,
                 );

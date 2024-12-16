@@ -3,18 +3,16 @@ import {
     CommandInteraction,
     Guild,
     OverwriteResolvable,
+    PermissionResolvable,
     VoiceChannel,
 } from 'discord.js';
 import { CommandCreator } from './CommandBot';
-import { Firestore } from 'firebase-admin/firestore';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
 
 export class CanalPrivadoCommand extends CommandCreator {
     public name = 'canalprivado';
     public name_localizations = null;
-
-    // Mensagem da descrição usando o arquivo de configurações
     public description = Config.getLang('commands.canalprivado.description');
     public description_localizations = null;
 
@@ -51,16 +49,12 @@ export class CanalPrivadoCommand extends CommandCreator {
         },
     ];
 
-    constructor(public db: Firestore) {
-        super();
-    }
-
-    private async update(
+    private async updateChannelPermissions(
         guild: Guild | null,
         channelName: string,
         permissions: string[],
         docRef: FirebaseFirestore.DocumentReference,
-    ) {
+    ): Promise<void> {
         if (!guild) return;
 
         const channel = guild.channels.cache.find(
@@ -68,206 +62,220 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ch.name === channelName && ch.type === ChannelType.GuildVoice,
         );
 
-        if (!channel) return;
+        const permissionOverwrites: OverwriteResolvable[] = [
+            ...permissions.map((id) => ({
+                id,
+                allow: ['ViewChannel'] as PermissionResolvable[],
+            })),
+            {
+                id: guild.roles.everyone.id,
+                deny: ['ViewChannel'] as PermissionResolvable[],
+            },
+            {
+                id: Config.getConfigLocal().Config_Discord_BOT.id,
+                allow: [
+                    'ViewChannel',
+                    'ManageChannels',
+                    'MoveMembers',
+                ] as PermissionResolvable[],
+            },
+        ];
 
-        if (!permissions.includes('1233496853698318448')) {
-            permissions.push('1233496853698318448');
+        if (channel) {
+            await (channel as VoiceChannel).permissionOverwrites.set(
+                permissionOverwrites,
+            );
         }
 
-        const permissionOverwrites = permissions.map((id) => ({
-            id: id,
-            allow: ['ViewChannel'],
-        })) as OverwriteResolvable[];
-
-        permissionOverwrites.push({
-            id: guild.roles.everyone.id,
-            deny: ['ViewChannel'],
-        });
-
-        permissionOverwrites.push({
-            id: '1233496853698318448',
-            allow: ['ViewChannel', 'ManageChannels', 'MoveMembers'],
-        });
-
-        await (channel as VoiceChannel).permissionOverwrites.set(
-            permissionOverwrites,
-        );
+        console.log(permissionOverwrites);
 
         await docRef.set({
-            channelName: channelName,
-            permissions: permissions,
+            channelName,
+            permissions,
         });
 
-        // Logando a atualização
-        Logger.info(
+        Config.configCache.delete(guild.id);
+
+        void Logger.info(
             'CanalPrivadoCommand',
             `Canal ${channelName} atualizado com permissões: ${permissions.join(', ')}`,
         );
     }
 
-    async execute(intr: CommandInteraction): Promise<void> {
-        const subcommand = intr.options.get('comando', true);
-        const user = intr.options.get('usuario', true);
-
-        const userId = user.user?.id;
-
-        if (!userId) {
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado.error_messages.user_invalid',
-                ),
-                ephemeral: true,
-            });
-            void Logger.warn(
-                'CanalPrivadoCommand',
-                `Usuário inválido recebido: ${String(userId)}`,
-            );
-            return;
-        }
-
-        const member = intr.guild?.members.cache.get(userId);
-
-        if (!member || member.user.bot) {
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado.error_messages.bot_invalid',
-                ),
-                ephemeral: true,
-            });
-            void Logger.warn(
-                'CanalPrivadoCommand',
-                `Tentativa de adicionar bot ao canal privado: ${userId}`,
-            );
-            return;
-        }
-
-        if (intr.user.id === userId) {
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado.error_messages.self_invalid',
-                ),
-                ephemeral: true,
-            });
-            void Logger.warn(
-                'CanalPrivadoCommand',
-                `Tentativa de adicionar usuário a si mesmo: ${userId}`,
-            );
-            return;
-        }
-
-        const docRef = this.db
-            .collection('privateVoiceChannels')
-            .doc(intr.user.id);
+    private async getPrivateChannelData(guildId: string, userId: string) {
+        const db = Config.getGuildCollection(guildId);
+        const docRef = db.collection('privateVoiceChannels').doc(userId);
         const doc = await docRef.get();
 
-        let allowedUsers: string[] = [];
-        let privateChannelName = '';
+        if (!doc.exists) return null;
 
-        if (doc.exists) {
-            const data = doc.data() as {
-                permissions: string[];
-                channelName: string;
-            };
+        return doc.data() as { permissions: string[]; channelName: string };
+    }
 
-            allowedUsers = data.permissions;
-            privateChannelName = data.channelName;
-            Logger.info(
-                'CanalPrivadoCommand',
-                `Configurações carregadas para o canal privado: ${privateChannelName}`,
-            );
-        } else {
-            await intr.reply({
-                content: Config.getLang(
-                    'commands.canalprivado.error_messages.no_channel',
-                ),
-                ephemeral: true,
-            });
-            void Logger.warn(
-                'CanalPrivadoCommand',
-                `Nenhum canal privado encontrado para o usuário: ${intr.user.id}`,
+    async execute(intr: CommandInteraction): Promise<void> {
+        const subcommand = intr.options.get('comando', true).value;
+        const user = intr.options.get('usuario', true).user;
+
+        await intr.deferReply({ ephemeral: true });
+
+        if (!intr.guild || !intr.guildId) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang('commands.canalprivado.error_messages.title'),
+                Config.getLang('commands.canalprivado.error_messages.no_guild'),
+                intr.user.id,
             );
             return;
         }
 
-        switch (subcommand.value) {
+        if (!user || user.bot || intr.user.id === user.id) {
+            const errorKey = user?.bot
+                ? 'commands.canalprivado.error_messages.bot_invalid'
+                : intr.user.id === user?.id
+                  ? 'commands.canalprivado.error_messages.self_invalid'
+                  : 'commands.canalprivado.error_messages.user_invalid';
+
+            await this.sendEmbed(
+                intr,
+                Config.getLang('commands.canalprivado.error_messages.title'),
+                Config.getLang(errorKey),
+                user?.id ?? 'N/A',
+            );
+            return;
+        }
+
+        const privateChannelData = await this.getPrivateChannelData(
+            intr.guildId,
+            intr.user.id,
+        );
+
+        if (!privateChannelData) {
+            await this.sendEmbed(
+                intr,
+                Config.getLang(
+                    'commands.canalprivado.error_messages.no_channel_title',
+                ),
+                Config.getLang(
+                    'commands.canalprivado.error_messages.no_channel',
+                ),
+                intr.user.id,
+            );
+            void Logger.warn(
+                'CanalPrivadoCommand',
+                `Nenhum canal privado encontrado para o ${intr.user.id}`,
+            );
+            return;
+        }
+
+        const { permissions, channelName } = privateChannelData;
+
+        switch (subcommand) {
             case 'add':
-                if (!allowedUsers.includes(userId)) {
-                    allowedUsers.push(userId);
-                    await this.update(
+                if (!permissions.includes(user.id)) {
+                    permissions.push(user.id);
+                    await this.updateChannelPermissions(
                         intr.guild,
-                        privateChannelName,
-                        allowedUsers,
-                        docRef,
+                        channelName,
+                        permissions,
+                        Config.getGuildCollection(intr.guildId)
+                            .collection('privateVoiceChannels')
+                            .doc(intr.user.id),
                     );
 
-                    await intr.reply({
-                        content: Config.getLang(
-                            'commands.canalprivado.error_messages.user_added',
-                        ).replace('{{userId}}', userId),
-                        ephemeral: true,
-                    });
-                    Logger.info(
+                    await this.sendEmbed(
+                        intr,
+                        Config.getLang(
+                            'commands.canalprivado.success_messages.sucess_title',
+                        ),
+                        Config.getLang(
+                            'commands.canalprivado.success_messages.user_added',
+                        ).replace('{{userId}}', user.id),
+                        channelName,
+                    );
+
+                    void Logger.info(
                         'CanalPrivadoCommand',
-                        `Usuário ${userId} adicionado ao canal privado: ${privateChannelName}`,
+                        `Usuário ${user.id} adicionado ao canal privado: ${channelName}`,
                     );
                 } else {
-                    await intr.reply({
-                        content: Config.getLang(
+                    await this.sendEmbed(
+                        intr,
+                        Config.getLang(
+                            'commands.canalprivado.error_messages.erro_title',
+                        ),
+                        Config.getLang(
                             'commands.canalprivado.error_messages.user_already_added',
-                        ).replace('{{userId}}', userId),
-                        ephemeral: true,
-                    });
+                        ).replace('{{userId}}', user.id),
+                        channelName,
+                    );
                     void Logger.warn(
                         'CanalPrivadoCommand',
-                        `Usuário ${userId} já estava no canal privado: ${privateChannelName}`,
+                        `Usuário ${user.id} já estava no canal privado: ${channelName}`,
                     );
                 }
                 break;
             case 'remove':
-                if (allowedUsers.includes(userId)) {
-                    allowedUsers = allowedUsers.filter((id) => id !== userId);
-
-                    await this.update(
+                if (permissions.includes(user.id)) {
+                    const updatedPermissions = permissions.filter(
+                        (id) => id !== user.id,
+                    );
+                    await this.updateChannelPermissions(
                         intr.guild,
-                        privateChannelName,
-                        allowedUsers,
-                        docRef,
+                        channelName,
+                        updatedPermissions,
+                        Config.getGuildCollection(intr.guildId)
+                            .collection('privateVoiceChannels')
+                            .doc(intr.user.id),
                     );
 
-                    await intr.reply({
-                        content: Config.getLang(
-                            'commands.canalprivado.error_messages.user_removed',
-                        ).replace('{{userId}}', userId),
-                        ephemeral: true,
-                    });
-                    Logger.info(
+                    await this.sendEmbed(
+                        intr,
+                        Config.getLang(
+                            'commands.canalprivado.success_messages.sucess_title',
+                        ),
+                        Config.getLang(
+                            'commands.canalprivado.success_messages.user_removed',
+                        ).replace('{{userId}}', user.id),
+                        channelName,
+                    );
+
+                    void Logger.info(
                         'CanalPrivadoCommand',
-                        `Usuário ${userId} removido do canal privado: ${privateChannelName}`,
+                        `Usuário ${user.id} removido do canal privado: ${channelName}`,
                     );
                 } else {
-                    await intr.reply({
-                        content: Config.getLang(
+                    await this.sendEmbed(
+                        intr,
+                        Config.getLang(
+                            'commands.canalprivado.error_messages.erro_title',
+                        ),
+                        Config.getLang(
                             'commands.canalprivado.error_messages.user_not_authorized',
-                        ).replace('{{userId}}', userId),
-                        ephemeral: true,
-                    });
+                        ).replace('{{userId}}', user.id),
+                        channelName,
+                    );
                     void Logger.warn(
                         'CanalPrivadoCommand',
-                        `Usuário ${userId} não autorizado a acessar o canal privado: ${privateChannelName}`,
+                        `Usuário ${user.id} não autorizado a acessar o canal privado: ${channelName}`,
                     );
                 }
                 break;
-            default:
-                await intr.reply({
-                    content: Config.getLang(
+            default: {
+                await this.sendEmbed(
+                    intr,
+                    Config.getLang(
+                        'commands.canalprivado.error_messages.erro_title',
+                    ),
+                    Config.getLang(
                         'commands.canalprivado.error_messages.invalid_command',
                     ),
-                    ephemeral: true,
-                });
+                    `Comando: ${subcommand as string}`,
+                );
                 void Logger.warn(
                     'CanalPrivadoCommand',
-                    `Comando inválido para o usuário ${intr.user.id}: ${String(subcommand.value)}`,
+                    `Comando inválido recebido: ${subcommand as string}`,
                 );
+            }
         }
     }
 }

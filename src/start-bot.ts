@@ -4,7 +4,7 @@ import { CommandHandle } from './event/CommandHandle';
 import { CommandCreator, PingCommand } from './command';
 import { Config, DiscordBot } from './model';
 import { AutoVoiceChannel } from './event/AutoVoiceChannel';
-// import { PrivateVoiceChannel } from './event/PrivateVoiceChannel';
+import { PrivateVoiceChannel } from './event/PrivateVoiceChannel';
 import { ServiceAccount, initializeApp } from 'firebase-admin/app';
 import { credential, firestore } from 'firebase-admin';
 import { CanalPrivadoCommand } from './command/CanalPrivadoCommand';
@@ -18,9 +18,11 @@ import { SetPrivateChannelCommand } from './command/SetPrivateChannelCommand';
 dotenvConfig();
 
 async function start(): Promise<void> {
-    Logger.init(
-        'https://discord.com/api/webhooks/1317535929727975538/XzucauZ8riW_SOsdpijTvOZCoZ_aECZRNe1b0PxaJQrP8ZC5JPtiYPXBvL-sPif3QI4c',
-    );
+    if (!process.env.DISCORD_WEB_HOOK_LOG) {
+        throw new Error('Env DISCORD_WEB_HOOK_LOG invalid...');
+    }
+
+    Logger.init(process.env.DISCORD_WEB_HOOK_LOG);
 
     if (!process.env.FIREBASE_ADMIN) {
         void Logger.error(
@@ -37,7 +39,7 @@ async function start(): Promise<void> {
             ),
         });
 
-        Logger.info(
+        void Logger.info(
             'Firebase Initialization',
             'Inicialização do Firebase realizada com sucesso',
         );
@@ -60,7 +62,7 @@ async function start(): Promise<void> {
     const db = firestore();
     Config.setDatabase(db);
 
-    Logger.info(
+    void Logger.info(
         'Bot Initialization',
         'Iniciando o processo de inicialização do bot...',
     );
@@ -70,17 +72,15 @@ async function start(): Promise<void> {
         new SetAutoVoiceChannelCommand(),
         new SetPrivateChannelCommand(),
         new PingCommand(),
-        new CanalPrivadoCommand(db),
-        new CanalPrivadoRenameCommand(db),
-        new CanalPrivadoPersistenciaCommand(db),
+        new CanalPrivadoCommand(),
+        new CanalPrivadoRenameCommand(),
+        new CanalPrivadoPersistenciaCommand(),
     ]);
-
-    // const privateVoiceChannel = new PrivateVoiceChannel(db);
 
     const bot = new DiscordBot({
         commandHandle,
         autoVoiceChannel: new AutoVoiceChannel(),
-        privateVoiceChannel: null,
+        privateVoiceChannel: new PrivateVoiceChannel(),
         client: new Client({
             intents: [
                 GatewayIntentBits.Guilds,
@@ -93,7 +93,7 @@ async function start(): Promise<void> {
     const { token, id } = Config.getConfigLocal().Config_Discord_BOT;
     const rest = new REST({ version: '10' }).setToken(token);
 
-    Logger.info(
+    void Logger.info(
         'Command Registration',
         'Iniciando o processo de registro de comandos...',
     );
@@ -105,7 +105,7 @@ async function start(): Promise<void> {
             ),
         });
 
-        Logger.info(
+        void Logger.info(
             'Command Registration',
             'Comandos registrados com sucesso no Discord',
         );
@@ -126,7 +126,7 @@ async function start(): Promise<void> {
 
     try {
         await bot.start();
-        Logger.info(
+        void Logger.info(
             'Bot Startup',
             'Bot iniciado com sucesso e funcionando normalmente',
         );
