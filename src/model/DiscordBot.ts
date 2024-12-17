@@ -92,6 +92,34 @@ export class DiscordBot {
             return;
         }
 
+        // Zoar o Ark
+
+        if (
+            (message.author.id === '425754513832411146' ||
+                message.author.id === '286701345090830336') &&
+            !message.author.bot
+        ) {
+            const CUSTOM_EMOTES = [
+                '1318681145495388260',
+                '1318680845091078194',
+                '1318680832889589823',
+                '1318680819333726228',
+                '1318680802719957042',
+                '1318680788488949780',
+                '1318680772336418937',
+                '1318680758025719880',
+                '1318680744226197623',
+                '1318680727918874684',
+            ];
+
+            const randomEmoteId =
+                CUSTOM_EMOTES[Math.floor(Math.random() * CUSTOM_EMOTES.length)];
+
+            const shouldReact = Math.random() < 0.1;
+
+            if (shouldReact) await message.react(randomEmoteId);
+        }
+
         if (fixLinks) {
             await fixLinks.execute(message);
         }

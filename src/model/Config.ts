@@ -141,6 +141,15 @@ export class Config {
                 },
             ],
         },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Sable Ward X Ghost Face...',
+                    type: ActivityType.Watching,
+                },
+            ],
+        },
     ];
 
     constructor(private NODE_ENV: EnvType = process.env.NODE_ENV as EnvType) {
