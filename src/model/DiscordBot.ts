@@ -4,6 +4,7 @@ import {
     CommandInteraction,
     Events,
     Interaction,
+    Message,
     VoiceState,
 } from 'discord.js';
 import { Config } from './Config';
@@ -11,12 +12,14 @@ import { CommandHandle } from '../event/CommandHandle';
 import { AutoVoiceChannel } from '../event/AutoVoiceChannel';
 import { PrivateVoiceChannel } from '../event/PrivateVoiceChannel';
 import { Logger } from './Logger';
+import { FixLinks } from '../event/FixLinks';
 
 interface TypeDiscordBot {
     client: Client;
     commandHandle: CommandHandle;
     autoVoiceChannel: AutoVoiceChannel | null;
     privateVoiceChannel: PrivateVoiceChannel | null;
+    fixLinks: FixLinks | null;
     token?: string;
 }
 
@@ -35,6 +38,11 @@ export class DiscordBot {
         client.on(Events.ClientReady, () => {
             this.onReady();
         });
+
+        client.on(
+            Events.MessageCreate,
+            (message) => void this.onMessageCreate(message),
+        );
 
         client.on(
             Events.InteractionCreate,
@@ -61,11 +69,9 @@ export class DiscordBot {
             this.handleError('Bot Login', err);
         }
     }
-
     // Lidar com interações de comandos
     private async onInteraction(intr: Interaction): Promise<void> {
         const { commandHandle } = this.data_bot;
-
         if (
             intr instanceof CommandInteraction ||
             intr instanceof AutocompleteInteraction
@@ -75,6 +81,18 @@ export class DiscordBot {
             } catch (err: unknown) {
                 this.handleError('Interaction Error', err);
             }
+        }
+    }
+
+    private async onMessageCreate(message: Message) {
+        const { fixLinks } = this.data_bot;
+
+        if (message.author.id === message.client.user.id) {
+            return;
+        }
+
+        if (fixLinks) {
+            await fixLinks.execute(message);
         }
     }
 

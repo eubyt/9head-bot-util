@@ -13,6 +13,7 @@ import { CanalPrivadoPersistenciaCommand } from './command/CanalPrivadoPersisten
 import { Logger } from './model/Logger';
 import { SetAutoVoiceChannelCommand } from './command/SetAutoVoiceChannelCommand';
 import { SetPrivateChannelCommand } from './command/SetPrivateChannelCommand';
+import { FixLinks } from './event/FixLinks';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
@@ -79,12 +80,17 @@ async function start(): Promise<void> {
 
     const bot = new DiscordBot({
         commandHandle,
+
         autoVoiceChannel: new AutoVoiceChannel(),
         privateVoiceChannel: new PrivateVoiceChannel(),
+        fixLinks: new FixLinks(),
+
         client: new Client({
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.MessageContent,
             ],
         }),
     });

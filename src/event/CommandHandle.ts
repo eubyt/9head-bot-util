@@ -23,6 +23,11 @@ export class CommandHandle implements EventHandler<'Command'> {
 
         if (intr instanceof AutocompleteInteraction) return;
 
+        if (!intr.guild) {
+            await intr.reply('https://discord.com/invite/TwUrTq2bnn');
+            return;
+        }
+
         await command.execute(intr, configGuild);
     }
 }
