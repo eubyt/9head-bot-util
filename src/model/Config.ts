@@ -1,4 +1,4 @@
-import { ColorResolvable } from 'discord.js';
+import { ActivityType, ColorResolvable, PresenceData } from 'discord.js';
 import { Loader } from '../util/Loader';
 import { Logger } from './Logger'; // Supondo que o Logger esteja sendo importado
 import { Firestore } from 'firebase-admin/firestore';
@@ -40,6 +40,108 @@ export class Config {
         string,
         Omit<ConfigData, 'Discord_User_ID_DEV' | 'Config_Discord_BOT'>
     >();
+
+    public static statuses: PresenceData[] = [
+        {
+            status: 'online',
+            activities: [
+                {
+                    name: 'Um louvor para mim...',
+                    type: ActivityType.Listening,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Deus, pátria, família e liberdade...',
+                    type: ActivityType.Watching,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Dead by Daylight',
+                    type: ActivityType.Competing,
+                },
+            ],
+        },
+        {
+            status: 'idle',
+            activities: [
+                {
+                    name: 'https://www.youtube.com/watch?v=2MTWu0lNVF4',
+                    type: ActivityType.Custom,
+                },
+            ],
+        },
+        {
+            status: 'idle',
+            activities: [
+                {
+                    name: 'Exposed da 9Head...',
+                    type: ActivityType.Listening,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Ban do eubyt...',
+                    type: ActivityType.Watching,
+                },
+            ],
+        },
+        {
+            status: 'idle',
+            activities: [
+                {
+                    name: '⁠Bilhões faz falta né?',
+                    type: ActivityType.Custom,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Toram Online',
+                    type: ActivityType.Playing,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Cyberbugs 2077',
+                    type: ActivityType.Playing,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Fortune Tiger',
+                    type: ActivityType.Playing,
+                },
+            ],
+        },
+        {
+            status: 'dnd',
+            activities: [
+                {
+                    name: 'Plataforma nova pagando...',
+                    type: ActivityType.Watching,
+                },
+            ],
+        },
+    ];
 
     constructor(private NODE_ENV: EnvType = process.env.NODE_ENV as EnvType) {
         this.validateEnv();

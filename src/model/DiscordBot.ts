@@ -1,5 +1,4 @@
 import {
-    ActivityType,
     AutocompleteInteraction,
     Client,
     ClientUser,
@@ -7,7 +6,6 @@ import {
     Events,
     Interaction,
     Message,
-    PresenceData,
     VoiceState,
 } from 'discord.js';
 import { Config } from './Config';
@@ -142,55 +140,22 @@ export class DiscordBot {
 
         this.randomStatus(client.user);
 
-        setInterval(() => {
-            this.randomStatus(client.user);
-        }, 3600000);
+        setInterval(
+            () => {
+                this.randomStatus(client.user);
+            },
+            1000 * 60 * 10,
+        );
 
         void Logger.info('Bot Ready', 'Client is ready');
     }
 
     private randomStatus(userBot: ClientUser | null) {
         if (!userBot) return;
-        const status: PresenceData[] = [
-            {
-                status: 'online',
-                activities: [
-                    {
-                        name: 'Um louvor para mim...',
-                        type: ActivityType.Listening,
-                    },
-                ],
-            },
-            {
-                status: 'dnd',
-                activities: [
-                    {
-                        name: 'Deus, pátria, família e liberdade...',
-                        type: ActivityType.Watching,
-                    },
-                ],
-            },
-            {
-                status: 'dnd',
-                activities: [
-                    {
-                        name: 'Dead by Daylight',
-                        type: ActivityType.Competing,
-                    },
-                ],
-            },
-            {
-                status: 'idle',
-                activities: [
-                    {
-                        name: 'https://www.youtube.com/watch?v=2MTWu0lNVF4',
-                        type: ActivityType.Custom,
-                    },
-                ],
-            },
-        ];
 
-        userBot.setPresence(status[Math.floor(Math.random() * status.length)]);
+        userBot.setPresence(
+            Config.statuses[Math.floor(Math.random() * Config.statuses.length)],
+        );
     }
 
     private handleError(context: string, err: unknown): void {
