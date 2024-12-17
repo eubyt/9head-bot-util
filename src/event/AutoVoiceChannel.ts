@@ -27,9 +27,43 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
         );
 
         // Lista de canais sem ninguém
-        const emptyChannels = allVoiceChannels.filter(
+        let emptyChannels = allVoiceChannels.filter(
             (x) => x.members.size === 0,
         );
+
+        const limparCanais = async () => {
+            for (const deleteChannel of allVoiceChannels.reverse().values()) {
+                if (
+                    deleteChannel.members.size > 0 ||
+                    allVoiceChannels.last()?.id === deleteChannel.id ||
+                    emptyChannels.size <= 1
+                ) {
+                    break;
+                }
+
+                try {
+                    void Logger.info(
+                        'AutoVoiceChannel',
+                        `Tentando deletar o canal vazio: ${deleteChannel.name}`,
+                    );
+
+                    emptyChannels = emptyChannels.filter(
+                        (x) => x.id !== deleteChannel.id,
+                    );
+                    await deleteChannel.delete();
+
+                    void Logger.info(
+                        'AutoVoiceChannel',
+                        `Canal deletado com sucesso: ${deleteChannel.name}`,
+                    );
+                } catch (e) {
+                    void Logger.error(
+                        'AutoVoiceChannel',
+                        `Não foi possível deletar o canal ${deleteChannel.name}: ${String(e)}`,
+                    );
+                }
+            }
+        };
 
         // Criar canal temp
         if (newState.channel) {
@@ -70,36 +104,9 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     `Não foi possível criar o canal ${channelName}: ${String(e)}`,
                 );
             }
-
             return;
         }
 
-        for (const deleteChannel of allVoiceChannels.reverse().values()) {
-            if (
-                deleteChannel.members.size > 0 ||
-                allVoiceChannels.last()?.id === deleteChannel.id
-            ) {
-                break;
-            }
-
-            try {
-                void Logger.info(
-                    'AutoVoiceChannel',
-                    `Tentando deletar o canal vazio: ${deleteChannel.name}`,
-                );
-
-                await deleteChannel.delete();
-
-                void Logger.info(
-                    'AutoVoiceChannel',
-                    `Canal deletado com sucesso: ${deleteChannel.name}`,
-                );
-            } catch (e) {
-                void Logger.error(
-                    'AutoVoiceChannel',
-                    `Não foi possível deletar o canal ${deleteChannel.name}: ${String(e)}`,
-                );
-            }
-        }
+        void limparCanais();
     }
 }
