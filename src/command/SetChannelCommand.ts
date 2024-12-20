@@ -40,6 +40,12 @@ export class SetChannelCommand extends CommandCreator {
             required: true,
             channel_types: [0],
         },
+        {
+            type: 8,
+            name: 'cargo',
+            description: 'Escolha o cargo',
+            required: false,
+        },
     ];
 
     async execute(intr: CommandInteraction): Promise<void> {
@@ -54,6 +60,7 @@ export class SetChannelCommand extends CommandCreator {
         const typeChannel = intr.options.get('tipo-canal', true)
             .value as string;
         const channel = intr.options.get('canal')?.channel as GuildBasedChannel;
+        const role = intr.options.get('cargo')?.role;
 
         if (!(await this.validatePermissions(intr))) return;
 
@@ -101,8 +108,23 @@ export class SetChannelCommand extends CommandCreator {
                 });
                 break;
             case 'ChannelCount':
+                if (!role) {
+                    await this.sendEmbed(
+                        intr,
+                        Config.getLang(
+                            'commands.setchannel.error_messages.erro_title',
+                        ),
+                        Config.getLang(
+                            'commands.setchannel.error_messages.no_role_selected',
+                        ),
+                        userId,
+                    );
+                    return;
+                }
+
                 await db.update({
                     CounterChannel: channel.id,
+                    CounterChannelRule: role.id,
                 });
                 break;
             default:

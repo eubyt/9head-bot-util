@@ -59,6 +59,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             message.channel instanceof TextChannel
         ) {
             const counterCurrent = config.CounterChannelAmount || 0;
+            const roleId = config.CounterChannelRule;
             let warnMessage = undefined;
 
             // Check Message is a number
@@ -72,8 +73,10 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             }
 
             // Verificar a mensagem
-            const nextNumber = Number(message.content) + 1;
-            if (nextNumber !== counterCurrent + 1 && !warnMessage) {
+            if (
+                Number(message.content) !== counterCurrent + 1 &&
+                !warnMessage
+            ) {
                 warnMessage = await message.channel.send({
                     content: Config.getLang(
                         'channelEvent.counter_next_number',
@@ -103,7 +106,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
             const db = Config.getGuildCollection(message.guildId);
             await db.update({
-                CounterChannelAmount: nextNumber,
+                CounterChannelAmount: counterCurrent + 1,
             });
 
             Config.configCache.delete(message.guildId);
@@ -128,6 +131,28 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                 content: message.content,
                 username: message.member?.displayName ?? 'Usuário',
                 avatarURL: message.author.displayAvatarURL(),
+            });
+
+            // Adicionar o cargo ao membro atual
+            const role = message.channel.guild.roles.cache.get(roleId);
+            if (!role) {
+                void Logger.error('Counter Channel', 'Cargo não encontrado');
+                return;
+            }
+
+            const membersWithRole = role.members;
+            for (const [, member] of membersWithRole) {
+                await member.roles.remove(roleId).catch(() => {
+                    void Logger.error(
+                        'Counter Channel',
+                        'Erro ao remover cargo:',
+                    );
+                });
+            }
+
+            // Adicionar o cargo ao membro atual
+            await message.member?.roles.add(roleId).catch(() => {
+                void Logger.error('Counter Channel', 'Erro ao adicionar cargo');
             });
 
             return;

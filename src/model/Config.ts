@@ -21,6 +21,7 @@ export interface ConfigData {
     FmBotChannel: string;
     CounterChannel: string;
     CounterChannelAmount: number;
+    CounterChannelRule: string;
     Embed: {
         default: ColorResolvable;
     };
@@ -253,6 +254,7 @@ export class Config {
             CommandChannel: 'null',
             FmBotChannel: 'null',
             CounterChannel: 'null',
+            CounterChannelRule: 'null',
             CounterChannelAmount: 0,
             Embed: {
                 default: '#000000',
