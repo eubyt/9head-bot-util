@@ -234,21 +234,6 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 `Criando novo canal com o nome ${newName}...`,
             );
 
-            const channelPermissions = channel.permissionOverwrites.cache;
-            for (const { id } of channelPermissions.values()) {
-                try {
-                    const user = await intr.guild.members
-                        .fetch(id)
-                        .catch(() => null);
-
-                    if (!user) {
-                        channelPermissions.delete(id);
-                    }
-                } catch {
-                    channelPermissions.delete(id);
-                }
-            }
-
             const newChannel = await intr.guild.channels.create({
                 name: newName,
                 type: ChannelType.GuildVoice,
