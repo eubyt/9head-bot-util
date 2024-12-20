@@ -22,6 +22,8 @@ export interface ConfigData {
     CounterChannel: string;
     CounterChannelAmount: number;
     CounterChannelRule: string;
+    FishingChannel: string;
+    NivelChannel: string;
     Embed: {
         default: ColorResolvable;
     };
@@ -256,6 +258,8 @@ export class Config {
             CounterChannel: 'null',
             CounterChannelRule: 'null',
             CounterChannelAmount: 0,
+            FishingChannel: 'null',
+            NivelChannel: 'null',
             Embed: {
                 default: '#000000',
             },

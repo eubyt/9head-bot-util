@@ -3,7 +3,6 @@ import { CommandCreator } from './CommandBot';
 import { Logger } from '../model/Logger';
 import { Config } from '../model';
 import { ConfigData } from '../model/Config';
-import { config } from 'process';
 
 export class SetChannelCommand extends CommandCreator {
     public name = 'config-server-channel';
@@ -30,6 +29,14 @@ export class SetChannelCommand extends CommandCreator {
                 {
                     name: 'Channel Count',
                     value: 'ChannelCount',
+                },
+                {
+                    name: 'Fishing',
+                    value: 'FishingChannel',
+                },
+                {
+                    name: 'Nivel',
+                    value: 'NivelChannel',
                 },
             ],
         },
@@ -105,6 +112,16 @@ export class SetChannelCommand extends CommandCreator {
             case 'FMbot':
                 await db.update({
                     FmBotChannel: channel.id,
+                });
+                break;
+            case 'FishingChannel':
+                await db.update({
+                    FishingChannel: channel.id,
+                });
+                break;
+            case 'NivelChannel':
+                await db.update({
+                    NivelChannel: channel.id,
                 });
                 break;
             case 'ChannelCount':

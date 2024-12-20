@@ -2,22 +2,54 @@ import { Message, TextChannel } from 'discord.js';
 import { EventHandler } from './EventHandler';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
-import { channel } from 'diagnostics_channel';
 
 export class ChannelCheckEvent implements EventHandler<'Message'> {
+    private async deleteMessage(message: Message, warningMessage?: Message) {
+        await message.react('🗑️');
+        setTimeout(() => {
+            [message, warningMessage].forEach((msg) => {
+                if (msg) {
+                    msg.delete().catch(() => {
+                        void Logger.error(
+                            'ChannelCheckEvent',
+                            'Erro ao deletar mensagem do canal',
+                        );
+                    });
+                }
+            });
+        }, 5000);
+    }
+
     async execute(message: Message): Promise<void> {
+        const fmRegexCommand = /\.(f|gw|r|c|u)(\s?.*)?/;
+
         if (message.author.bot || !message.guildId) return;
 
         const config = await Config.getConfig(message.guildId);
         if (!config || !message.guildId) return;
 
         if (
+            config.NivelChannel === message.channelId ||
+            config.FishingChannel === message.channelId
+        ) {
+            void this.deleteMessage(message);
+            return;
+        }
+
+        // Apenas comandos de FMbot são permitidos
+        if (config.FmBotChannel === message.channelId) {
+            if (!fmRegexCommand.test(message.content)) {
+                void this.deleteMessage(message);
+                return;
+            }
+        }
+
+        // Avisar o canal do FMbot
+        if (
             config.FmBotChannel !== message.channelId &&
             config.CommandChannel === message.channelId
         ) {
-            const forbiddenCommandsRegex = /\.(f|gw|r|c|u)(\s?.*)?/;
-
-            if (forbiddenCommandsRegex.test(message.content)) {
+            if (fmRegexCommand.test(message.content)) {
                 try {
                     await message.react('❌');
 
@@ -49,7 +81,6 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                     console.error('Erro ao processar a mensagem:', error);
                 }
             }
-
             return;
         }
 
@@ -62,7 +93,6 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             const roleId = config.CounterChannelRule;
             let warnMessage = undefined;
 
-            // Check Message is a number
             if (isNaN(Number(message.content))) {
                 warnMessage = await message.channel.send({
                     content: Config.getLang(
@@ -72,7 +102,6 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                 });
             }
 
-            // Verificar a mensagem
             if (
                 Number(message.content) !== counterCurrent + 1 &&
                 !warnMessage
@@ -86,21 +115,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             }
 
             if (warnMessage) {
-                setTimeout(() => {
-                    message.delete().catch(() => {
-                        void Logger.error(
-                            'Counter Channel',
-                            'Erro ao deletar a mensagem de número errado',
-                        );
-                    });
-
-                    warnMessage.delete().catch(() => {
-                        void Logger.error(
-                            'Counter Channel',
-                            'Erro ao deletar a mensagem de aviso',
-                        );
-                    });
-                }, 5000);
+                void this.deleteMessage(message, warnMessage);
                 return;
             }
 
