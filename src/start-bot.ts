@@ -95,6 +95,7 @@ async function start(): Promise<void> {
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildPresences,
             ],
         }),
     });

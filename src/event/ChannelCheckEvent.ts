@@ -134,6 +134,8 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             });
 
             // Adicionar o cargo ao membro atual
+            // Loading members with the role
+
             const role = message.channel.guild.roles.cache.get(roleId);
             if (!role) {
                 void Logger.error('Counter Channel', 'Cargo não encontrado');
