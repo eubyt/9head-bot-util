@@ -14,6 +14,8 @@ import { Logger } from './model/Logger';
 import { SetAutoVoiceChannelCommand } from './command/SetAutoVoiceChannelCommand';
 import { SetPrivateChannelCommand } from './command/SetPrivateChannelCommand';
 import { FixLinks } from './event/FixLinks';
+import { SetChannelCommand } from './command/SetChannelCommand';
+import { ChannelCheckEvent } from './event/ChannelCheckEvent';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
@@ -76,6 +78,7 @@ async function start(): Promise<void> {
         new CanalPrivadoCommand(),
         new CanalPrivadoRenameCommand(),
         new CanalPrivadoPersistenciaCommand(),
+        new SetChannelCommand(),
     ]);
 
     const bot = new DiscordBot({
@@ -84,6 +87,7 @@ async function start(): Promise<void> {
         autoVoiceChannel: new AutoVoiceChannel(),
         privateVoiceChannel: new PrivateVoiceChannel(),
         fixLinks: new FixLinks(),
+        channelCheckEvent: new ChannelCheckEvent(),
 
         client: new Client({
             intents: [

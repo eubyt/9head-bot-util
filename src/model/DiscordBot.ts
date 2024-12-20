@@ -14,6 +14,7 @@ import { AutoVoiceChannel } from '../event/AutoVoiceChannel';
 import { PrivateVoiceChannel } from '../event/PrivateVoiceChannel';
 import { Logger } from './Logger';
 import { FixLinks } from '../event/FixLinks';
+import { ChannelCheckEvent } from '../event/ChannelCheckEvent';
 
 interface TypeDiscordBot {
     client: Client;
@@ -21,6 +22,7 @@ interface TypeDiscordBot {
     autoVoiceChannel: AutoVoiceChannel | null;
     privateVoiceChannel: PrivateVoiceChannel | null;
     fixLinks: FixLinks | null;
+    channelCheckEvent: ChannelCheckEvent | null;
     token?: string;
 }
 
@@ -86,7 +88,7 @@ export class DiscordBot {
     }
 
     private async onMessageCreate(message: Message) {
-        const { fixLinks } = this.data_bot;
+        const { fixLinks, channelCheckEvent } = this.data_bot;
 
         if (message.author.id === message.client.user.id) {
             return;
@@ -122,6 +124,10 @@ export class DiscordBot {
 
         if (fixLinks) {
             await fixLinks.execute(message);
+        }
+
+        if (channelCheckEvent) {
+            await channelCheckEvent.execute(message);
         }
     }
 

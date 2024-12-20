@@ -1,4 +1,9 @@
 {
+    "channelEvent": {
+        "warn_channel_fmbot": "Você deve utilizar o canal {{channel}} para interagir com o FMbot.",
+        "counter_number_invalid": "O número fornecido não é válido. Por favor, forneça um número válido.",
+        "counter_next_number": "O próximo número é `{{nextNumber}}`."
+    },
     "commands": {
         "ping": {
             "latency_test": "*Testando latência....*",
@@ -127,6 +132,19 @@
                 "channels_cleared": "Todos os canais de voz privados foram removidos com sucesso.",
                 "channel_added": "Canal de voz privado adicionado com sucesso na categoria {{channelName}}.",
                 "channel_removed": "Canal de voz privado removido com sucesso."
+            }
+        },
+        "setchannel": {
+            "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
+                "channel_created": "O canal {{channelName}} foi adicionado ao {{commandName}} com sucesso!"
+            },
+            "error_messages": {
+                "erro_title": "Ocorreu um erro",
+                "general_error": "Ocorreu um erro ao tentar processar o comando.",
+                "no_permission": "Você não tem permissão para gerenciar canais.",
+                "channel_already_exists": "O canal já foi adicionado.",
+                "command_not_found": "O comando não foi encontrado."
             }
         }
     }

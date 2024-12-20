@@ -17,6 +17,10 @@ export interface ConfigData {
         channelId: string;
         categoryId: string;
     }[];
+    CommandChannel: string;
+    FmBotChannel: string;
+    CounterChannel: string;
+    CounterChannelAmount: number;
     Embed: {
         default: ColorResolvable;
     };
@@ -246,6 +250,10 @@ export class Config {
         > = {
             AutoVoiceChannel: [],
             PrivateVoiceChannel: [],
+            CommandChannel: 'null',
+            FmBotChannel: 'null',
+            CounterChannel: 'null',
+            CounterChannelAmount: 0,
             Embed: {
                 default: '#000000',
             },
