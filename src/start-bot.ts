@@ -1,5 +1,5 @@
 import { config as dotenvConfig } from 'dotenv'; // Importar o dotenv
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
 import { CommandHandle } from './event/CommandHandle';
 import { CommandCreator, PingCommand } from './command';
 import { Config, DiscordBot } from './model';
@@ -92,11 +92,34 @@ async function start(): Promise<void> {
         client: new Client({
             intents: [
                 GatewayIntentBits.Guilds,
-                GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildEmojisAndStickers,
+                GatewayIntentBits.GuildIntegrations,
+                GatewayIntentBits.GuildInvites,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.GuildMessageTyping,
                 GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.MessageContent,
                 GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.GuildScheduledEvents,
+                GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildWebhooks,
+                GatewayIntentBits.DirectMessages,
+                GatewayIntentBits.DirectMessageTyping,
+                GatewayIntentBits.DirectMessageReactions,
+                GatewayIntentBits.MessageContent,
             ],
+            partials: [
+                Partials.Channel,
+                Partials.GuildMember,
+                Partials.GuildScheduledEvent,
+                Partials.Message,
+                Partials.Reaction,
+                Partials.ThreadMember,
+                Partials.User,
+            ],
+            allowedMentions: {
+                parse: ['everyone', 'roles', 'users'],
+            },
         }),
     });
 

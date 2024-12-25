@@ -1,0 +1,43 @@
+Termos de Serviço
+
+Os seguintes Termos de Serviço regem o uso do bot do Discord ("9Head"). Ao utilizar o Bot, você concorda em cumprir estes termos. Caso não concorde com qualquer parte destes Termos, você não deve usar o Bot.
+
+Uso Permitido
+    - O uso do Bot deve estar em conformidade com os Termos de Serviço e Diretrizes da Comunidade do Discord.
+
+Finalidade do Bot:
+    - O Bot destina-se a oferecer funcionalidades de automação, moderação e interatividade em servidores do Discord.
+
+Proibições de Uso:
+    - É proibido usar o Bot para fins ilegais, abusivos ou que violem direitos de terceiros.
+    - É proibido comercializar o código fonte do Bot.
+
+Responsabilidades do Usuário
+    1. Segurança e Acesso:
+        Você é responsável por garantir que apenas usuários autorizados tenham acesso aos comandos do Bot em seu servidor.
+
+    2. Concessão de Permissões:
+        O Bot requer permissões específicas para funcionar corretamente. Garantir que essas permissões sejam concedidas é de responsabilidade do administrador do servidor.
+
+    3. Conteúdo Gerado:
+        Você é responsável por todo o conteúdo gerado pelos comandos do Bot em seu servidor.
+
+    4. Coleta de Dados
+        Dados Coletados:
+            - O Bot coleta informações conforme descrito na Política de Privacidade.
+
+    5. Responder as Solicitação de Exclusão de Dados:
+        Você deve realizar a exclusão dos dados solicitado nos logs registrado pelo Bot.
+
+Limitação de Responsabilidade
+    1. Disponibilidade:
+        Não garantimos que o Bot estará disponível ininterruptamente ou livre de erros.
+
+    2. Danos:
+        O Bot é fornecido "como está". Não nos responsabilizamos por danos diretos, indiretos ou consequentes decorrentes do uso do Bot.
+
+Alterações nos Termos
+    Reservamo-nos o direito de modificar estes Termos a qualquer momento. Quaisquer alterações serão notificadas através de canais apropriados no Discord.
+
+Contato
+    Em caso de dúvidas ou preocupações sobre estes Termos de Serviço, entre em contato com o administrador do Bot.

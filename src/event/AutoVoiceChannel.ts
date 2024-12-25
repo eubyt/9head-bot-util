@@ -1,6 +1,6 @@
 import { EventHandler } from './EventHandler';
 import { CategoryChannel, ChannelType, VoiceState } from 'discord.js';
-import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
+import { Logger } from '../model/Logger';
 import { Config } from '../model';
 
 export class AutoVoiceChannel implements EventHandler<'VoiceState'> {

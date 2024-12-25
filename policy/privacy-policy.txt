@@ -1,0 +1,42 @@
+Política de Privacidade
+
+Esta Política de Privacidade descreve como o bot do Discord ("9Head") coleta, usa e protege as informações dos usuários ao interagir com os servidores do Discord onde ele se encontra. 
+
+O Bot pode coletar as seguintes informações abaixo:
+    - IDs de servidores, canais, mensagens e usuários.
+    - Eventos relacionados às atividades do servidor, como alterações em canais de voz, reações, mensagens e presenças.
+    - Mensagens e Conteúdo:
+        - O conteúdo das mensagens é processado conforme necessário para comandos ou recursos do Bot.
+        - O bot pode armazenar para fins de log (Nos servidores que ele se encontra) mensagens deletadas e editadas.
+
+Logs e Moderação
+Dados coletados para fins de log, como registro de mensagens deletadas e eventos relevantes para a moderação do servidor.
+
+Uso das Informações
+As informações coletadas são utilizadas para:
+    - Fornecer os recursos e funcionalidades do Bot, incluindo comandos e eventos automatizados.
+    - Melhorar a experiência do usuário e corrigir erros.
+    - Garantir a segurança dos servidores que o bot faz a moderação.
+    - Facilitar atividades de moderação, como revisar mensagens deletadas.
+
+Compartilhamento de Dados
+Não compartilhamos informações com terceiros, exceto quando exigido por lei ou para cooperar com investigações legais.
+
+Proteção das Informações
+Empregamos medidas de segurança adequadas para proteger as informações coletadas contra acessos não autorizados, alterações ou divulgações indevidas.
+
+Retenção de Dados
+Os dados processados pelo Bot são mantidos temporariamente e descartados após o uso, a menos que seja necessário reter informações por um período mais longo para fins legais ou de segurança.
+Os usuários podem solicitar a exclusão dos logs coletados para moderação do servidor, entrando em contato com o administrador do Bot.
+
+Direitos do Usuário
+Os usuários têm o direito de:
+    - Solicitar informações sobre os dados coletados pelo Bot.
+    - Solicitar a exclusão de seus dados, caso aplicável.
+    - Solicitar a não coleta de seus dados.
+
+Alterações nesta Política
+Reservamo-nos o direito de atualizar esta Política de Privacidade a qualquer momento. Notificações sobre alterações serão fornecidas através de canais apropriados no Discord.
+
+Contato
+Em caso de dúvidas ou preocupações sobre esta Política de Privacidade, entre em contato com o administrador do Bot.

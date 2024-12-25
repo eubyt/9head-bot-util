@@ -8,7 +8,7 @@ import {
     PermissionResolvable,
 } from 'discord.js';
 import { Config } from '../model';
-import { Logger } from '../model/Logger'; // Supondo que o Logger esteja em '../model/Logger'
+import { Logger } from '../model/Logger';
 
 interface VoiceChannelData {
     channelName: string;
@@ -35,7 +35,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         if (typeof categoryId !== 'string') return;
 
         const guild: Guild = newState.guild;
-        let channelName = newState.member?.user.displayName ?? 'invalid';
+        let channelName = newState.member?.displayName ?? 'invalid';
         const userId = newState.member?.id;
 
         if (!userId) {
@@ -133,11 +133,15 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 const permissionOverwrites: OverwriteResolvable[] = [
                     ...allowedUsers.map((id) => ({
                         id,
-                        allow: ['ViewChannel'] as PermissionResolvable[],
+                        allow: [
+                            'ViewChannel',
+                            'Connect',
+                        ] as PermissionResolvable[],
                     })),
                     {
                         id: guild.roles.everyone.id,
-                        deny: ['ViewChannel'] as PermissionResolvable[],
+                        allow: ['ViewChannel'] as PermissionResolvable[],
+                        deny: ['Connect'] as PermissionResolvable[],
                     },
                     {
                         id: Config.getConfigLocal().Config_Discord_BOT.id,

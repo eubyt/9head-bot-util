@@ -15,6 +15,7 @@ import { PrivateVoiceChannel } from '../event/PrivateVoiceChannel';
 import { Logger } from './Logger';
 import { FixLinks } from '../event/FixLinks';
 import { ChannelCheckEvent } from '../event/ChannelCheckEvent';
+import { ServerLogger } from '../logger/ServerLogger';
 
 interface TypeDiscordBot {
     client: Client;
@@ -40,6 +41,7 @@ export class DiscordBot {
 
         client.on(Events.ClientReady, () => {
             this.onReady();
+            // new ServerLogger(client);
         });
 
         client.on(

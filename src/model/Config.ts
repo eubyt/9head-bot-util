@@ -1,6 +1,6 @@
 import { ActivityType, ColorResolvable, PresenceData } from 'discord.js';
 import { Loader } from '../util/Loader';
-import { Logger } from './Logger'; // Supondo que o Logger esteja sendo importado
+import { Logger } from './Logger';
 import { Firestore } from 'firebase-admin/firestore';
 
 export interface ConfigData {
@@ -39,9 +39,7 @@ export class Config {
     private static _language: Record<LangType, Record<string, unknown>> = {
         pt_BR: {},
     };
-    private static db: Firestore = // Iniciar a instância do Firestore
-        // Adapte o código abaixo para inicializar sua instância Firestore
-        new Firestore();
+    private static db: Firestore = new Firestore();
 
     public static configCache = new Map<
         string,

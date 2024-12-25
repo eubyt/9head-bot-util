@@ -35,7 +35,7 @@ export class FixLinks implements EventHandler<'Message'> {
         const matchInstagram = message.content.match(instagramRegex);
 
         if (matchInstagram) {
-            const newLink = message.content.replace(
+            const newLink = matchInstagram[0].replace(
                 'instagram.com',
                 'instagramez.com',
             );
