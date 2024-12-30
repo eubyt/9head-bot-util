@@ -6,17 +6,13 @@ export async function logEditedMessage(
     thread: ThreadChannel,
     oldMessage: Message | PartialMessage,
     newMessage: Message | PartialMessage,
+    partial: boolean,
 ): Promise<void> {
     try {
-        if (oldMessage.partial || newMessage.partial) {
-            oldMessage = await oldMessage.fetch();
-            newMessage = await newMessage.fetch();
-        }
-
-        const oldContent = oldMessage.content;
-        const newContent = newMessage.content;
-        const author = oldMessage.author.tag;
-        const authorId = oldMessage.author.id;
+        const oldContent = oldMessage.content ?? 'Conteúdo desconhecido';
+        const newContent = newMessage.content ?? 'Conteúdo desconhecido';
+        const author = oldMessage.author?.tag ?? 'Autor desconhecido';
+        const authorId = oldMessage.author?.id ?? 'ID desconhecido';
 
         let channelName = 'Canal desconhecido';
         let channelId = 'ID desconhecido';
@@ -29,7 +25,7 @@ export async function logEditedMessage(
             ? new Date(oldMessage.createdTimestamp).toISOString()
             : 'Data desconhecida';
 
-        const header = `[EDIT_LOG] | Canal: <#${channelId}> | Autor: <@${authorId}>`;
+        const header = `• **[EDITADO]** | Canal: <#${channelId}> | Autor: <@${authorId}> | Editado há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff
 - Data/Hora:   ${timestamp}
@@ -38,22 +34,26 @@ export async function logEditedMessage(
 - Mensagem ID: ${oldMessage.id}
 \`\`\``;
 
-        if (oldContent === newContent) {
+        if (oldContent === newContent && !partial) {
             return;
         }
 
         await sendLogMessage('', thread, header, details);
+
+        if (!partial) {
+            await sendLogMessage(
+                newContent,
+                thread,
+                '',
+                '```diff\n+ [ANTIGO] ' + oldContent + '\n```',
+            );
+        }
+
         await sendLogMessage(
             newContent,
             thread,
             '',
-            '```diff\n+ [Antigo] ' + oldContent + '\n```',
-        );
-        await sendLogMessage(
-            newContent,
-            thread,
-            '',
-            '```diff\n+ [Novo] ' + newContent + '\n```',
+            '```diff\n+ [NOVO] ' + newContent + '\n```',
         );
     } catch (error: unknown) {
         void Logger.error(

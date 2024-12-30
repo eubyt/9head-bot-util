@@ -51,7 +51,7 @@ export async function logDeletedMessage(
             );
         }
 
-        const header = `[DELETE_LOG] | Canal: <#${channelId}> | Autor: <@${authorId}> | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
+        const header = `• **[DELETADO]** | Canal: <#${channelId}> | Autor: <@${authorId}> | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff
 - Data/Hora:   ${timestamp}
@@ -65,7 +65,7 @@ ${deleter ? `+ Deletada por: ${deleter}\n` : ''}
             await sendLogMessage(
                 '',
                 thread,
-                `[DELETED MESSAGE] Canal: <#${channelId}>`,
+                `• **[DELETADO]** Canal: <#${channelId}>`,
                 `\`\`\`diff
 - Mensagem ID: ${message.id}
 - Não é possivel recuperar informações da mensagem.

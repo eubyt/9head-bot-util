@@ -16,6 +16,7 @@ import { Logger } from './Logger';
 import { FixLinks } from '../event/FixLinks';
 import { ChannelCheckEvent } from '../event/ChannelCheckEvent';
 import { ServerLogger } from '../logger/ServerLogger';
+import { initializeInviteTracking } from '../logger/LogJoinLeave';
 
 interface TypeDiscordBot {
     client: Client;
@@ -41,7 +42,7 @@ export class DiscordBot {
 
         client.on(Events.ClientReady, () => {
             this.onReady();
-            // new ServerLogger(client);
+            new ServerLogger(client);
         });
 
         client.on(
@@ -172,6 +173,7 @@ export class DiscordBot {
 
         client.guilds.cache.forEach((guild) => {
             void Config.checkAndCreateGuildConfig(guild.id);
+            void initializeInviteTracking(guild);
         });
 
         this.randomStatus(client.user);

@@ -38,6 +38,14 @@ export class SetChannelCommand extends CommandCreator {
                     name: 'Nivel',
                     value: 'NivelChannel',
                 },
+                {
+                    name: 'Logger',
+                    value: 'LoggerChannel',
+                },
+                {
+                    name: 'Ban Logger',
+                    value: 'BanLoggerChannel',
+                },
             ],
         },
         {
@@ -122,6 +130,16 @@ export class SetChannelCommand extends CommandCreator {
             case 'NivelChannel':
                 await db.update({
                     NivelChannel: channel.id,
+                });
+                break;
+            case 'LoggerChannel':
+                await db.update({
+                    LoggerChannel: channel.id,
+                });
+                break;
+            case 'BanLoggerChannel':
+                await db.update({
+                    BanLoggerChannel: channel.id,
                 });
                 break;
             case 'ChannelCount':

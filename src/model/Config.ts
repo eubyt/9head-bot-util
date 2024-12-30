@@ -24,6 +24,8 @@ export interface ConfigData {
     CounterChannelRule: string;
     FishingChannel: string;
     NivelChannel: string;
+    LoggerChannel: string;
+    BanLoggerChannel: string;
     Embed: {
         default: ColorResolvable;
     };
@@ -209,23 +211,8 @@ export class Config {
         return this._config;
     }
 
-    public static async getConfig(
-        guildId: string,
-    ): Promise<ConfigData | undefined> {
-        // Busca a configuração do servidor no Firestore
-        const guildConfigRef = this.db.collection('guilds').doc(guildId);
-        const guildConfigDoc = await guildConfigRef.get();
-
-        if (guildConfigDoc.exists) {
-            const guildConfig = guildConfigDoc.data() as ConfigData;
-            return guildConfig;
-        } else {
-            void Logger.error(
-                'Config Fetch',
-                `No configuration found for guild with ID: ${guildId}`,
-            );
-            return undefined;
-        }
+    public static async getConfig(guildId: string) {
+        return await Config.checkAndCreateGuildConfig(guildId);
     }
 
     public static setConfig(config: ConfigData) {
@@ -239,6 +226,7 @@ export class Config {
     public static async checkAndCreateGuildConfig(guildId: string) {
         // Verificar se o cache já possui a configuração
         if (this.configCache.has(guildId)) {
+            void Logger.info('Config Guild', 'Usando Cache');
             return this.configCache.get(guildId);
         }
 
@@ -258,6 +246,8 @@ export class Config {
             CounterChannelAmount: 0,
             FishingChannel: 'null',
             NivelChannel: 'null',
+            LoggerChannel: 'null',
+            BanLoggerChannel: 'null',
             Embed: {
                 default: '#000000',
             },
