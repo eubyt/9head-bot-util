@@ -249,11 +249,12 @@ export class ServerLogger {
         const channel = guild.channels.cache.get(channelId);
 
         if (!channel || channel.type !== ChannelType.GuildText) {
-            console.log(channel?.type);
             return null;
         }
 
-        let thread = channel.threads.cache.find((t) => t.name === name);
+        let thread = channel.threads.cache.find(
+            (t) => t.name === name && t.ownerId === this.client.user?.id,
+        );
 
         if (!thread) {
             try {

@@ -32,7 +32,11 @@ export function logUserUpdate(
 
         client.guilds.cache.forEach((guild) => {
             guild.channels.cache.forEach((channel) => {
-                if (channel.isThread() && channel.name === thread) {
+                if (
+                    channel.isThread() &&
+                    channel.name === thread &&
+                    channel.ownerId === client.user?.id
+                ) {
                     const thread = channel;
                     void thread.send({
                         content: `<@${newMember.id}>`,
