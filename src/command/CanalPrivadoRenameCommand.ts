@@ -66,14 +66,14 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
 
         await intr.deferReply({ ephemeral: true });
 
-        void Logger.info(
+        Logger.info(
             'CanalPrivadoRenameCommand',
             `Novo nome recebido: ${newName}`,
         );
 
         // Verifica se o nome do canal é válido
         if (!this.isValidChannelName(newName)) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 'Nome do canal excedeu o limite de 32 caracteres.',
             );
@@ -106,7 +106,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         );
 
         if (!privateChannelDoc) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 `Usuário ${intr.user.id} não tem um canal privado.`,
             );
@@ -125,7 +125,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         }
 
         const privateChannelName = privateChannelDoc.channelName as string;
-        void Logger.info(
+        Logger.info(
             'CanalPrivadoRenameCommand',
             `Nome do canal privado no Firestore: ${privateChannelName}`,
         );
@@ -138,7 +138,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         ) as VoiceChannel | undefined;
 
         if (!channel) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 `Canal ${privateChannelName} não encontrado no servidor.`,
             );
@@ -161,7 +161,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             !botMember ||
             !this.hasManageChannelsPermission(channel, botMember)
         ) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 'Bot não tem permissão para gerenciar o canal.',
             );
@@ -186,7 +186,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         );
 
         if (existingChannel) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no servidor.`,
             );
@@ -211,7 +211,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             .get();
 
         if (!existingChannelQuery.empty) {
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoRenameCommand',
                 `Já existe um canal com o nome ${newName} no Firestore.`,
             );
@@ -229,7 +229,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
         }
 
         try {
-            void Logger.info(
+            Logger.info(
                 'CanalPrivadoRenameCommand',
                 `Criando novo canal com o nome ${newName}...`,
             );
@@ -249,7 +249,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 ),
             });
 
-            void Logger.info(
+            Logger.info(
                 'CanalPrivadoRenameCommand',
                 `Novo canal criado com o nome ${newName}.`,
             );
@@ -259,7 +259,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 member.voice.setChannel(newChannel),
             );
             await Promise.all(movePromises);
-            void Logger.info(
+            Logger.info(
                 'CanalPrivadoRenameCommand',
                 'Todos os membros foram movidos para o novo canal.',
             );
@@ -267,7 +267,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
             // Deleta o canal antigo, se possível
             if (channel.deletable) {
                 await channel.delete();
-                void Logger.info(
+                Logger.info(
                     'CanalPrivadoRenameCommand',
                     `Canal antigo ${privateChannelName} deletado.`,
                 );
@@ -290,7 +290,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
                 userId,
             );
         } catch (error) {
-            void Logger.error(
+            Logger.error(
                 'CanalPrivadoRenameCommand',
                 `Erro ao tentar alterar o nome do canal: ${String(error)}`,
             );

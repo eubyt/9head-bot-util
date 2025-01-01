@@ -14,7 +14,7 @@ export class PingCommand extends CommandCreator {
     public options = [];
 
     async execute(intr: CommandInteraction): Promise<void> {
-        void Logger.info(
+        Logger.info(
             'PingCommand',
             `Comando ping iniciado pelo usuário ${intr.user.id}`,
         );
@@ -54,7 +54,7 @@ export class PingCommand extends CommandCreator {
             embeds: [PingEmbed],
         });
 
-        void Logger.info(
+        Logger.info(
             'PingCommand',
             `Latência para o usuário ${intr.user.id}: roundtrip ${latency_roundtrip}ms, websocket ${websocket_heartbeat}ms`,
         );

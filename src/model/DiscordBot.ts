@@ -70,7 +70,7 @@ export class DiscordBot {
             await client.login(
                 token ?? Config.getConfigLocal().Config_Discord_BOT.token,
             );
-            void Logger.info('Bot Login', 'Bot logged in successfully');
+            Logger.info('Bot Login', 'Bot logged in successfully');
         } catch (err: unknown) {
             this.handleError('Bot Login', err);
         }
@@ -143,7 +143,7 @@ export class DiscordBot {
         if (privateVoiceChannel) {
             try {
                 await privateVoiceChannel.execute(oldState, newState);
-                void Logger.info(
+                Logger.info(
                     'Voice State Update',
                     'Executed private voice channel update',
                 );
@@ -157,7 +157,7 @@ export class DiscordBot {
         if (autoVoiceChannel) {
             try {
                 await autoVoiceChannel.execute(oldState, newState);
-                void Logger.info(
+                Logger.info(
                     'Voice State Update',
                     'Executed auto voice channel update',
                 );
@@ -185,7 +185,7 @@ export class DiscordBot {
             1000 * 60 * 10,
         );
 
-        void Logger.info('Bot Ready', 'Client is ready');
+        Logger.info('Bot Ready', 'Client is ready');
     }
 
     private randomStatus(userBot: ClientUser | null) {
@@ -199,6 +199,6 @@ export class DiscordBot {
     private handleError(context: string, err: unknown): void {
         const errorMessage =
             err instanceof Error ? err.message : 'Unknown error';
-        void Logger.error(context, errorMessage);
+        Logger.error(context, errorMessage);
     }
 }

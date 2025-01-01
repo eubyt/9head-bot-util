@@ -167,20 +167,14 @@ export class Config {
     private validateEnv() {
         if (!ALLOWED_NODE_ENV.includes(this.NODE_ENV)) {
             const errorMessage = `Invalid NODE_ENV value: ${this.NODE_ENV}. It must be either 'development' or 'production'.`;
-            void Logger.error('Config Validation', errorMessage);
+            Logger.error('Config Validation', errorMessage);
             return;
         }
-        void Logger.info(
-            'Config Validation',
-            `NODE_ENV set to: ${this.NODE_ENV}`,
-        );
+        Logger.info('Config Validation', `NODE_ENV set to: ${this.NODE_ENV}`);
     }
 
     private loadConfig() {
-        void Logger.info(
-            'Config Loading',
-            `Loading ${this.NODE_ENV} config....`,
-        );
+        Logger.info('Config Loading', `Loading ${this.NODE_ENV} config....`);
 
         try {
             const configLoader = Loader.JSON(
@@ -194,7 +188,7 @@ export class Config {
 
             Config.setConfig(configLoader);
 
-            void Logger.info(
+            Logger.info(
                 'Config Loading',
                 'Configuração carregada com sucesso.',
             );
@@ -202,7 +196,7 @@ export class Config {
             const errorMessage = `Configuration file is missing or invalid: ${
                 err instanceof Error ? err.message : 'Unknown error'
             }`;
-            void Logger.error('Config Loading', errorMessage);
+            Logger.error('Config Loading', errorMessage);
             return;
         }
     }
@@ -226,7 +220,7 @@ export class Config {
     public static async checkAndCreateGuildConfig(guildId: string) {
         // Verificar se o cache já possui a configuração
         if (this.configCache.has(guildId)) {
-            void Logger.info('Config Guild', 'Usando Cache');
+            Logger.info('Config Guild', 'Usando Cache');
             return this.configCache.get(guildId);
         }
 
@@ -260,7 +254,7 @@ export class Config {
             await guildConfigRef.set(defaultConfig);
             guildConfig = defaultConfig;
 
-            void Logger.info(
+            Logger.info(
                 'Guild Config Creation',
                 `Configuração criada para a guild ${guildId}`,
             );
@@ -283,7 +277,7 @@ export class Config {
                 });
 
                 await guildConfigRef.set(guildConfig);
-                void Logger.info(
+                Logger.info(
                     'Guild Config Update',
                     `Configuração atualizada para a guild ${guildId}. Campos ausentes adicionados: ${missingFields.join(
                         ', ',
@@ -306,7 +300,7 @@ export class Config {
         if (Object.keys(this._language[lang]).length === 0) {
             try {
                 const langData = Loader.JSON(`../lang/${lang}.json`);
-                void Logger.info(
+                Logger.info(
                     'Lang Loading',
                     `Idioma ${lang} carregado com sucesso.`,
                 );
@@ -315,7 +309,7 @@ export class Config {
                 const errorMessage = `Configuration file for language "${lang}" is missing or invalid: ${
                     err instanceof Error ? err.message : 'Unknown error'
                 }`;
-                void Logger.error('Lang Loading', errorMessage);
+                Logger.error('Lang Loading', errorMessage);
                 return 'Invalid';
             }
         }
@@ -335,7 +329,7 @@ export class Config {
         }
 
         const errorMessage = `"${prop}" must be a string or number, but got ${typeof result}`;
-        void Logger.error('Lang Loading', errorMessage);
+        Logger.error('Lang Loading', errorMessage);
         return 'Invalid';
     }
 }

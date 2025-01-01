@@ -69,7 +69,7 @@ export class SetPrivateChannelCommand extends CommandCreator {
     async execute(intr: CommandInteraction): Promise<void> {
         const userId = intr.user.id;
 
-        void Logger.info(
+        Logger.info(
             'SetPrivateChannelCommand',
             `Comando setprivatevoicechannel iniciado pelo usuário ${intr.user.id}`,
         );

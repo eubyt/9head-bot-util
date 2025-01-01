@@ -102,7 +102,7 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                 userId,
             );
 
-            void Logger.info(
+            Logger.info(
                 'CanalPrivadoPersistenciaCommand',
                 `Persistência do canal ${channelName} alterada para: ${statusMessage}`,
             );
@@ -117,7 +117,7 @@ export class CanalPrivadoPersistenciaCommand extends CommandCreator {
                 ),
                 userId,
             );
-            void Logger.error(
+            Logger.error(
                 'CanalPrivadoPersistenciaCommand',
                 `Erro ao alterar persistência do canal ${channelName}: ${String(
                     error,

@@ -264,7 +264,7 @@ export class ServerLogger {
                     reason: 'Thread criada para logs de mensagens deletadas.',
                 });
             } catch (error) {
-                void Logger.error(
+                Logger.error(
                     'Server Log',
                     `Erro ao criar thread de log: ${String(error)}`,
                 );

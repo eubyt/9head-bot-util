@@ -96,7 +96,7 @@ export class CanalPrivadoCommand extends CommandCreator {
 
         Config.configCache.delete(guild.id);
 
-        void Logger.info(
+        Logger.info(
             'CanalPrivadoCommand',
             `Canal ${channelName} atualizado com permissões: ${permissions.join(', ')}`,
         );
@@ -160,7 +160,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ),
                 intr.user.id,
             );
-            void Logger.warn(
+            Logger.warn(
                 'CanalPrivadoCommand',
                 `Nenhum canal privado encontrado para o ${intr.user.id}`,
             );
@@ -193,7 +193,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         channelName,
                     );
 
-                    void Logger.info(
+                    Logger.info(
                         'CanalPrivadoCommand',
                         `Usuário ${user.id} adicionado ao canal privado: ${channelName}`,
                     );
@@ -208,7 +208,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', user.id),
                         channelName,
                     );
-                    void Logger.warn(
+                    Logger.warn(
                         'CanalPrivadoCommand',
                         `Usuário ${user.id} já estava no canal privado: ${channelName}`,
                     );
@@ -239,7 +239,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         channelName,
                     );
 
-                    void Logger.info(
+                    Logger.info(
                         'CanalPrivadoCommand',
                         `Usuário ${user.id} removido do canal privado: ${channelName}`,
                     );
@@ -254,7 +254,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         ).replace('{{userId}}', user.id),
                         channelName,
                     );
-                    void Logger.warn(
+                    Logger.warn(
                         'CanalPrivadoCommand',
                         `Usuário ${user.id} não autorizado a acessar o canal privado: ${channelName}`,
                     );
@@ -271,7 +271,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                     ),
                     `Comando: ${subcommand as string}`,
                 );
-                void Logger.warn(
+                Logger.warn(
                     'CanalPrivadoCommand',
                     `Comando inválido recebido: ${subcommand as string}`,
                 );

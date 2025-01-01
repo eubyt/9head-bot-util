@@ -39,7 +39,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         const userId = newState.member?.id;
 
         if (!userId) {
-            void Logger.error('PrivateVoiceChannel', 'User ID not found.');
+            Logger.error('PrivateVoiceChannel', 'User ID not found.');
             return;
         }
 
@@ -57,7 +57,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             if (doc.exists) {
                 const data = doc.data() as VoiceChannelData;
                 if (data.persistente) {
-                    void Logger.info(
+                    Logger.info(
                         'PrivateVoiceChannel',
                         `O canal de ${userId} é persistente.`,
                     );
@@ -66,13 +66,13 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
-                void Logger.info(
+                Logger.info(
                     'PrivateVoiceChannel',
                     `Canal de voz removido com sucesso: ${oldState.channel.name}`,
                 );
                 await oldState.channel.delete();
             } catch (error) {
-                void Logger.error(
+                Logger.error(
                     'PrivateVoiceChannel',
                     `Erro ao remover o canal de voz: ${String(error)}`,
                 );
@@ -89,7 +89,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
 
-                    void Logger.info(
+                    Logger.info(
                         'PrivateVoiceChannel',
                         `Canal encontrado: ${channelName}`,
                     );
@@ -109,7 +109,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
 
                 if (existingChannel) {
                     await newState.member.voice.setChannel(existingChannel);
-                    void Logger.info(
+                    Logger.info(
                         'PrivateVoiceChannel',
                         `Usuário ${userId} movido para o canal existente: ${existingChannel.name}`,
                     );
@@ -122,7 +122,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                         .catch(() => null);
 
                     if (!user) {
-                        void Logger.warn(
+                        Logger.warn(
                             'PrivateVoiceChannel',
                             `Usuário com ID ${userId} não encontrado no servidor.`,
                         );
@@ -164,7 +164,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 });
 
                 await newState.member.voice.setChannel(newChannel);
-                void Logger.info(
+                Logger.info(
                     'PrivateVoiceChannel',
                     `Canal de voz criado com sucesso: ${newChannel.name}`,
                 );
@@ -178,7 +178,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 });
             }
         } catch (error) {
-            void Logger.error(
+            Logger.error(
                 'PrivateVoiceChannel',
                 `Erro ao mover o usuário ou criar o documento no Firestore: ${String(error)}`,
             );

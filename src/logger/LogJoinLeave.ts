@@ -102,7 +102,7 @@ export async function logJoinLeave(
             files: [avatarAttachment],
         });
     } catch (error) {
-        void Logger.error('Server Log', 'Erro em gerar log de entrada/saída.');
+        Logger.error('Server Log', 'Erro em gerar log de entrada/saída.');
     }
 }
 

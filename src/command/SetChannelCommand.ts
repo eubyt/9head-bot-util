@@ -65,7 +65,7 @@ export class SetChannelCommand extends CommandCreator {
 
     async execute(intr: CommandInteraction): Promise<void> {
         const userId = intr.user.id;
-        void Logger.info(
+        Logger.info(
             'SetChannelCommand',
             `Comando SetChannel foi iniciado pelo usuário ${intr.user.id}`,
         );

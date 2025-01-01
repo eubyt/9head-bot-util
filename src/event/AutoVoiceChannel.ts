@@ -42,7 +42,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                 }
 
                 try {
-                    void Logger.info(
+                    Logger.info(
                         'AutoVoiceChannel',
                         `Tentando deletar o canal vazio: ${deleteChannel.name}`,
                     );
@@ -52,12 +52,12 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     );
                     await deleteChannel.delete();
 
-                    void Logger.info(
+                    Logger.info(
                         'AutoVoiceChannel',
                         `Canal deletado com sucesso: ${deleteChannel.name}`,
                     );
                 } catch (e) {
-                    void Logger.error(
+                    Logger.error(
                         'AutoVoiceChannel',
                         `Não foi possível deletar o canal ${deleteChannel.name}: ${String(e)}`,
                     );
@@ -73,7 +73,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             );
 
             if (emptyChannels.size > 0) {
-                void Logger.info(
+                Logger.info(
                     'AutoVoiceChannel',
                     `Canais vazios encontrados: ${emptyChannels.map((x) => x.name).join(', ')}`,
                 );
@@ -81,7 +81,7 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             }
 
             try {
-                void Logger.info(
+                Logger.info(
                     'AutoVoiceChannel',
                     `Criando novo canal: ${channelName}`,
                 );
@@ -94,12 +94,12 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     bitrate: channel.guild.maximumBitrate,
                 });
 
-                void Logger.info(
+                Logger.info(
                     'AutoVoiceChannel',
                     `Canal criado com sucesso: ${channelName}`,
                 );
             } catch (e) {
-                void Logger.error(
+                Logger.error(
                     'AutoVoiceChannel',
                     `Não foi possível criar o canal ${channelName}: ${String(e)}`,
                 );

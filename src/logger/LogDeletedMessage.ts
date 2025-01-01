@@ -45,10 +45,7 @@ export async function logDeletedMessage(
                 }
             }
         } catch {
-            void Logger.error(
-                'Server Log',
-                'Erro ao buscar logs de auditoria.',
-            );
+            Logger.error('Server Log', 'Erro ao buscar logs de auditoria.');
         }
 
         const header = `• **[DELETADO]** | Canal: <#${channelId}> | Autor: <@${authorId}> | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
@@ -82,7 +79,7 @@ ${deleter ? `+ Deletada por: ${deleter}\n` : ''}
             });
         }
     } catch (error: unknown) {
-        void Logger.error(
+        Logger.error(
             'Server Log',
             `Erro ao enviar log para a thread: ${String(error)}`,
         );

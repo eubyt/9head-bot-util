@@ -61,7 +61,7 @@ export async function logEditedMessage(
             '```diff\n+ [NOVO] ' + newContent + '\n```',
         );
     } catch (error: unknown) {
-        void Logger.error(
+        Logger.error(
             'Server Log',
             `Erro ao enviar log para a thread: ${String(error)}`,
         );

@@ -28,10 +28,7 @@ async function start(): Promise<void> {
     Logger.init(process.env.DISCORD_WEB_HOOK_LOG);
 
     if (!process.env.FIREBASE_ADMIN) {
-        void Logger.error(
-            'Firebase Configuration',
-            'Chave Firebase admin inválida',
-        );
+        Logger.error('Firebase Configuration', 'Chave Firebase admin inválida');
         throw new Error('Firebase key admin invalid');
     }
 
@@ -42,18 +39,18 @@ async function start(): Promise<void> {
             ),
         });
 
-        void Logger.info(
+        Logger.info(
             'Firebase Initialization',
             'Inicialização do Firebase realizada com sucesso',
         );
     } catch (error) {
         if (error instanceof Error) {
-            void Logger.error(
+            Logger.error(
                 'Firebase Initialization',
                 `Erro ao inicializar o Firebase: ${error.message}`,
             );
         } else {
-            void Logger.error(
+            Logger.error(
                 'Firebase Initialization',
                 'Erro desconhecido ao inicializar o Firebase',
             );
@@ -65,7 +62,7 @@ async function start(): Promise<void> {
     const db = firestore();
     Config.setDatabase(db);
 
-    void Logger.info(
+    Logger.info(
         'Bot Initialization',
         'Iniciando o processo de inicialização do bot...',
     );
@@ -128,7 +125,7 @@ async function start(): Promise<void> {
     const { token, id } = Config.getConfigLocal().Config_Discord_BOT;
     const rest = new REST({ version: '10' }).setToken(token);
 
-    void Logger.info(
+    Logger.info(
         'Command Registration',
         'Iniciando o processo de registro de comandos...',
     );
@@ -140,18 +137,18 @@ async function start(): Promise<void> {
             ),
         });
 
-        void Logger.info(
+        Logger.info(
             'Command Registration',
             'Comandos registrados com sucesso no Discord',
         );
     } catch (error) {
         if (error instanceof Error) {
-            void Logger.error(
+            Logger.error(
                 'Command Registration',
                 `Erro ao registrar comandos no Discord: ${error.message}`,
             );
         } else {
-            void Logger.error(
+            Logger.error(
                 'Command Registration',
                 'Erro desconhecido ao registrar comandos no Discord',
             );
@@ -161,21 +158,18 @@ async function start(): Promise<void> {
 
     try {
         await bot.start();
-        void Logger.info(
+        Logger.info(
             'Bot Startup',
             'Bot iniciado com sucesso e funcionando normalmente',
         );
     } catch (error) {
         if (error instanceof Error) {
-            void Logger.error(
+            Logger.error(
                 'Bot Startup',
                 `Erro ao iniciar o bot: ${error.message}`,
             );
         } else {
-            void Logger.error(
-                'Bot Startup',
-                'Erro desconhecido ao iniciar o bot',
-            );
+            Logger.error('Bot Startup', 'Erro desconhecido ao iniciar o bot');
         }
         throw error;
     }
@@ -183,12 +177,12 @@ async function start(): Promise<void> {
 
 start().catch((err: unknown) => {
     if (err instanceof Error) {
-        void Logger.error(
+        Logger.error(
             'Application Error',
             `Erro não tratado na execução da aplicação: ${err.message}`,
         );
     } else {
-        void Logger.error(
+        Logger.error(
             'Application Error',
             'Erro desconhecido na execução da aplicação',
         );

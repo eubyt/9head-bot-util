@@ -64,7 +64,7 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
     async execute(intr: CommandInteraction): Promise<void> {
         const userId = intr.user.id;
 
-        void Logger.info(
+        Logger.info(
             'SetAutoVoiceChannelCommand',
             `Comando iniciado pelo usuário ${userId}`,
         );
