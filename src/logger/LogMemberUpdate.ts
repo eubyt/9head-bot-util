@@ -15,6 +15,14 @@ export async function logMemberUpdate(
         name: 'avatar.png',
     });
 
+    const sendMessage = async () => {
+        await thread.send({
+            content: `<@${newMember.id}>`,
+            embeds: [embed],
+            files: [avatarAttachment],
+        });
+    };
+
     const embed = new EmbedBuilder()
         .setDescription(
             `**${newMember.user.tag} atualizou o perfil no servidor**`,
@@ -25,7 +33,20 @@ export async function logMemberUpdate(
             iconURL: newMember.user.displayAvatarURL(),
         })
         .setThumbnail('attachment://avatar.png')
-        .setTimestamp();
+        .setTimestamp()
+        .addFields({
+            name: 'Informações do Usuário',
+            value: `<t:${Math.floor(newMember.user.createdTimestamp / 1000).toString()}:F>`,
+            inline: true,
+        });
+
+    if (newMember.joinedTimestamp) {
+        embed.addFields({
+            name: 'Tempo no servidor',
+            value: `<t:${Math.floor(newMember.joinedTimestamp / 1000).toString()}:R>`,
+            inline: true,
+        });
+    }
 
     if (oldMember.user.avatar !== newMember.user.avatar) {
         const oldAvatarUrl = oldMember.user.displayAvatarURL({ size: 1024 });
@@ -42,6 +63,9 @@ export async function logMemberUpdate(
                 value: `[Clique aqui](${newAvatarUrl})`,
             },
         );
+
+        await sendMessage();
+        return;
     }
 
     if (oldMember.nickname !== newMember.nickname) {
@@ -49,6 +73,9 @@ export async function logMemberUpdate(
             name: 'Nickname',
             value: `${oldMember.nickname ?? newMember.user.displayName} ➔ ${newMember.nickname ?? newMember.user.displayName}`,
         });
+
+        await sendMessage();
+        return;
     }
 
     if (oldMember.user.username !== newMember.user.username) {
@@ -57,6 +84,9 @@ export async function logMemberUpdate(
             value: `${oldMember.user.username} ➔ ${newMember.user.username}`,
             inline: true,
         });
+
+        await sendMessage();
+        return;
     }
 
     const addedRoles = newMember.roles.cache.filter(
@@ -80,25 +110,7 @@ export async function logMemberUpdate(
                 value: removedRoles.map((r) => `*${r.name}*`).join(', '),
             });
         }
+
+        await sendMessage();
     }
-
-    embed.addFields({
-        name: 'Informações do Usuário',
-        value: `<t:${Math.floor(newMember.user.createdTimestamp / 1000).toString()}:F>`,
-        inline: true,
-    });
-
-    if (newMember.joinedTimestamp) {
-        embed.addFields({
-            name: 'Tempo no servidor',
-            value: `<t:${Math.floor(newMember.joinedTimestamp / 1000).toString()}:R>`,
-            inline: true,
-        });
-    }
-
-    await thread.send({
-        content: `<@${newMember.id}>`,
-        embeds: [embed],
-        files: [avatarAttachment],
-    });
 }

@@ -103,6 +103,7 @@ async function start(): Promise<void> {
                 GatewayIntentBits.GuildScheduledEvents,
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.GuildWebhooks,
+                GatewayIntentBits.GuildModeration,
                 GatewayIntentBits.DirectMessages,
                 GatewayIntentBits.DirectMessageTyping,
                 GatewayIntentBits.DirectMessageReactions,

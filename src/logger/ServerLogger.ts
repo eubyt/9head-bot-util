@@ -5,6 +5,7 @@ import {
     ThreadChannel,
     ChannelType,
     VoiceState,
+    GuildBan,
 } from 'discord.js';
 import { Logger } from '../model/Logger';
 import { logDeletedMessage } from './LogDeletedMessage';
@@ -14,6 +15,7 @@ import { logMemberUpdate } from './LogMemberUpdate';
 import { logUserUpdate } from './LogUserUpdate';
 import { logVoice } from './LogVoice';
 import { Config } from '../model';
+import { LogBanMessage, logKickMessage, LogTimeoutMessage } from './LogPunish';
 
 export async function sendLogMessage(
     mensagem: string,
@@ -131,6 +133,19 @@ export class ServerLogger {
             if (thread) {
                 void logJoinLeave(thread, member, false);
             }
+
+            if (config.BanLoggerChannel) {
+                const channel = this.client.channels.cache.get(
+                    config.BanLoggerChannel,
+                );
+
+                if (
+                    channel?.type === ChannelType.GuildText ||
+                    channel?.isThread()
+                ) {
+                    void logKickMessage(channel, member);
+                }
+            }
         });
 
         this.client.on('guildMemberUpdate', async (oldMember, newMember) => {
@@ -149,6 +164,19 @@ export class ServerLogger {
 
             if (thread) {
                 void logMemberUpdate(thread, oldMember, newMember);
+            }
+
+            if (config.BanLoggerChannel) {
+                const channel = this.client.channels.cache.get(
+                    config.BanLoggerChannel,
+                );
+
+                if (
+                    channel?.type === ChannelType.GuildText ||
+                    channel?.isThread()
+                ) {
+                    void LogTimeoutMessage(channel, oldMember, newMember);
+                }
             }
         });
 
@@ -178,6 +206,39 @@ export class ServerLogger {
                 }
             },
         );
+
+        /// Punish
+        this.client.on('guildBanAdd', async (ban: GuildBan) => {
+            const config = await Config.getConfig(ban.guild.id);
+            if (config === undefined) return;
+
+            const channel = this.client.channels.cache.get(
+                config.BanLoggerChannel,
+            );
+
+            if (
+                channel?.type === ChannelType.GuildText ||
+                channel?.isThread()
+            ) {
+                void LogBanMessage(channel, ban, false);
+            }
+        });
+
+        this.client.on('guildBanRemove', async (ban: GuildBan) => {
+            const config = await Config.getConfig(ban.guild.id);
+            if (config === undefined) return;
+
+            const channel = this.client.channels.cache.get(
+                config.BanLoggerChannel,
+            );
+
+            if (
+                channel?.type === ChannelType.GuildText ||
+                channel?.isThread()
+            ) {
+                void LogBanMessage(channel, ban, true);
+            }
+        });
     }
 
     private async getThreadLogger(

@@ -34,7 +34,7 @@ export async function logEditedMessage(
 - Mensagem ID: ${oldMessage.id}
 \`\`\``;
 
-        if (oldContent === newContent && !partial) {
+        if (oldContent == newContent && !partial) {
             return;
         }
 

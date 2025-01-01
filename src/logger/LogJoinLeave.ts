@@ -49,9 +49,12 @@ export async function logJoinLeave(
 
             inviteUsed = currentInvites.find(
                 (invite) =>
-                    (cachedInvites?.get(invite.code)?.uses ?? 0) <
-                    (invite.uses ?? 0),
+                    cachedInvites?.get(invite.code)?.uses !== invite.uses,
             );
+
+            if (!inviteUsed) {
+                inviteUsed = currentInvites.find((invite) => invite.uses === 1);
+            }
         }
 
         const embed = new EmbedBuilder()
