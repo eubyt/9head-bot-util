@@ -62,7 +62,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 const fixMention = message.content.replace(
                     '@Code Notification',
-                    `<@${NineHead.pingRole.dbdCodePing}>`,
+                    `<@&${NineHead.pingRole.dbdCodePing}>`,
                 );
 
                 this.sendMessage(
@@ -91,7 +91,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                                 .includes(e.toLocaleLowerCase()),
                         )
                     ) {
-                        messageEdit.content = `<@&${NineHead.pingRole.dbdNewsPing}>`;
+                        messageEdit.content = `<@&&${NineHead.pingRole.dbdNewsPing}>`;
                     }
                 }
 
@@ -119,7 +119,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Dark Auction')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockDarkAuction}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockDarkAuction}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -129,7 +129,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Hunt')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockHunt}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockHunt}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -139,7 +139,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Happy New Year Event')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockNewYear}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockNewYear}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -149,7 +149,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Jerrys Workshop Event')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockSeasonOfJerry}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockSeasonOfJerry}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -159,7 +159,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Jerrys Workshop Open')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockJerryWorkshop}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockJerryWorkshop}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -169,7 +169,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Spooky Event')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockSpooky}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockSpooky}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -179,7 +179,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Traveling Zoo')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockTravellingZoo}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockTravellingZoo}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -189,7 +189,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mayor Election')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockElection}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockElection}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -199,7 +199,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Fishing Festival')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockFestivel}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -209,7 +209,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Fishing Festival')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockFestivel}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -219,7 +219,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mythological')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockMythological}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockMythological}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -229,7 +229,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mining')) {
                     this.sendMessage(
-                        `<@${NineHead.pingRole.skyblockFiesta}>\n${description}`,
+                        `<@&${NineHead.pingRole.skyblockFiesta}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -263,15 +263,15 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const fixMention = message.content
                     .replace(
                         '@SkyBlock News',
-                        `<@${NineHead.pingRole.skyblockNews}>`,
+                        `<@&${NineHead.pingRole.skyblockNews}>`,
                     )
                     .replace(
                         '@SkyBlock Status',
-                        `<@${NineHead.pingRole.skyblockNews}>`,
+                        `<@&${NineHead.pingRole.skyblockNews}>`,
                     )
                     .replace(
                         '@SkyBlock Fire Sale',
-                        `<@${NineHead.pingRole.skyblockFireSale}>`,
+                        `<@&${NineHead.pingRole.skyblockFireSale}>`,
                     )
                     .replace('@SkyBlock Tidbits', '')
                     .replace('@SkyBlock Leaks', '');
