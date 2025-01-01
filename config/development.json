@@ -2,5 +2,41 @@
     "Discord_User_ID_DEV": [],
     "Embed": {
         "default": "#2B2D31"
+    },
+    "NineHead": {
+        "serverMention": "1240785113898418256",
+        "nineHeadServer": "1240785113898418256",
+
+        "channelNewsMention": {
+            "skyblockNews": "1323910111516692651",
+            "skyblockChangeVersion": "1323922591307796550",
+            "skyblockCalendar": "1323924390613614612",
+            "dbdNews": "1323956345271091252",
+            "dbdCode": "1323958802789306428"
+        },
+
+        "gameChannel": {
+            "skyblock": "1323917142126497832",
+            "dbd": "1323917142126497832"
+        },
+
+        "pingRole": {
+            "skyblockNews": "1323910111516692651",
+            "skyblockFireSale": "1317082493052129311",
+            "skyblockSpooky": "1317082325343014914",
+            "skyblockJerryWorkshop": "1317084066880688159",
+            "skyblockNewYear": "1317087232200282202",
+            "skyblockSeasonOfJerry": "1317087350526050356",
+            "skyblockElection": "1317087414509899806",
+            "skyblockTravellingZoo": "1317087478179692565",
+            "skyblockDarkAuction": "1317087556214456380",
+            "skyblockFear": "1317087669913653338",
+            "skyblockFestivel": "1317390184601616386",
+            "skyblockHunt": "1317390256898576414",
+            "skyblockFiesta": "1317390316839637065",
+            "skyblockMythological": "1317393295566962730",
+            "dbdNewsPing": "1323964782738673685",
+            "dbdCodePing": "1323964990016979076"
+        }
     }
 }

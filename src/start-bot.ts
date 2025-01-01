@@ -16,6 +16,7 @@ import { SetPrivateChannelCommand } from './command/SetPrivateChannelCommand';
 import { FixLinks } from './event/FixLinks';
 import { SetChannelCommand } from './command/SetChannelCommand';
 import { ChannelCheckEvent } from './event/ChannelCheckEvent';
+import { NineHeadMention } from './event/NineHeadMention';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
@@ -85,6 +86,7 @@ async function start(): Promise<void> {
         privateVoiceChannel: new PrivateVoiceChannel(),
         fixLinks: new FixLinks(),
         channelCheckEvent: new ChannelCheckEvent(),
+        NineHeadMention: new NineHeadMention(),
 
         client: new Client({
             intents: [

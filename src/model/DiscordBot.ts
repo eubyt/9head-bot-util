@@ -17,6 +17,7 @@ import { FixLinks } from '../event/FixLinks';
 import { ChannelCheckEvent } from '../event/ChannelCheckEvent';
 import { ServerLogger } from '../logger/ServerLogger';
 import { initializeInviteTracking } from '../logger/LogJoinLeave';
+import { NineHeadMention } from '../event/NineHeadMention';
 
 interface TypeDiscordBot {
     client: Client;
@@ -25,6 +26,7 @@ interface TypeDiscordBot {
     privateVoiceChannel: PrivateVoiceChannel | null;
     fixLinks: FixLinks | null;
     channelCheckEvent: ChannelCheckEvent | null;
+    NineHeadMention: NineHeadMention | null;
     token?: string;
 }
 
@@ -91,7 +93,7 @@ export class DiscordBot {
     }
 
     private async onMessageCreate(message: Message) {
-        const { fixLinks, channelCheckEvent } = this.data_bot;
+        const { fixLinks, channelCheckEvent, NineHeadMention } = this.data_bot;
 
         if (message.author.id === message.client.user.id) {
             return;
@@ -131,6 +133,10 @@ export class DiscordBot {
 
         if (channelCheckEvent) {
             await channelCheckEvent.execute(message);
+        }
+
+        if (NineHeadMention) {
+            NineHeadMention.execute(message);
         }
     }
 

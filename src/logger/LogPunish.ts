@@ -71,6 +71,11 @@ export async function LogTimeoutMessage(
         return;
     }
 
+    // Punished time invalid
+    if (isTimedOut && isTimedOut.getTime() < Date.now()) {
+        return;
+    }
+
     const newAvatarUrl = newMember.user.displayAvatarURL({ size: 1024 });
     const avatarAttachment = new AttachmentBuilder(newAvatarUrl, {
         name: 'avatar.png',

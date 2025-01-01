@@ -29,6 +29,39 @@ export interface ConfigData {
     Embed: {
         default: ColorResolvable;
     };
+    NineHead: {
+        serverMention: string;
+        nineHeadServer: string;
+        channelNewsMention: {
+            skyblockNews: string;
+            skyblockChangeVersion: string;
+            skyblockCalendar: string;
+            dbdNews: string;
+            dbdCode: string;
+        };
+        pingRole: {
+            skyblockNews: string;
+            skyblockFireSale: string;
+            skyblockSpooky: string;
+            skyblockJerryWorkshop: string;
+            skyblockNewYear: string;
+            skyblockSeasonOfJerry: string;
+            skyblockElection: string;
+            skyblockTravellingZoo: string;
+            skyblockDarkAuction: string;
+            skyblockFear: string;
+            skyblockFestivel: string;
+            skyblockHunt: string;
+            skyblockFiesta: string;
+            skyblockMythological: string;
+            dbdNewsPing: string;
+            dbdCodePing: string;
+        };
+        gameChannel: {
+            skyblock: string;
+            dbd: string;
+        };
+    };
 }
 
 type LangType = 'pt_BR';
@@ -45,7 +78,10 @@ export class Config {
 
     public static configCache = new Map<
         string,
-        Omit<ConfigData, 'Discord_User_ID_DEV' | 'Config_Discord_BOT'>
+        Omit<
+            ConfigData,
+            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead'
+        >
     >();
 
     public static statuses: PresenceData[] = [
@@ -229,7 +265,7 @@ export class Config {
 
         const defaultConfig: Omit<
             ConfigData,
-            'Discord_User_ID_DEV' | 'Config_Discord_BOT'
+            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead'
         > = {
             AutoVoiceChannel: [],
             PrivateVoiceChannel: [],
