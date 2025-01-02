@@ -106,7 +106,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
     }
 
     execute(message: Message): void {
-        // if (!message.author.bot) return;
+        if (!message.author.bot) return;
 
         const guildId = message.guild?.id;
         const channelId = message.channel.id;
