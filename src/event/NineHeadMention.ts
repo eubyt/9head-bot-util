@@ -122,8 +122,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 Logger.info('NineHeadMention', 'DBD Code detected');
 
                 const webhookUsername = 'Code | Dead By Daylight';
-                const webhookAvatarURL =
-                    'https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/f/f7/IconHelp_bloodpoints.png/revision/latest?cb=20200715193808';
+                const webhookAvatarURL = 'https://i.imgur.com/5o7qJYn.png';
 
                 const fixMention = message.content.replace(
                     '@Code Notification',
@@ -146,8 +145,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const messageEdit = message;
 
                 const webhookUsername = 'Dead By Daylight';
-                const webhookAvatarURL =
-                    'https://us.v-cdn.net/6030815/uploads/J9YMAWL8FNCK/pynj3akid4e1.jpg';
+                const webhookAvatarURL = 'https://i.imgur.com/byEWgKs.jpeg';
 
                 if (messageEdit.embeds.length > 0) {
                     if (
@@ -184,13 +182,11 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const description = `> ${message.embeds[0].description ?? ''}`;
 
                 let webhookUsername = 'Skyblock Time';
-                let webhookAvatarURL =
-                    'https://wiki.hypixel.net/images/b/b6/SkyBlock_items_clock_animated.gif';
+                let webhookAvatarURL = 'https://i.imgur.com/WTrzmk1.gif';
 
                 if (embedTitle?.includes('Dark Auction')) {
                     webhookUsername = 'Dark Auction | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/e/ed/SkyBlock_sprite_npcs_sirius.png';
+                    webhookAvatarURL = 'https://i.imgur.com/RuKdJu2.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockDarkAuction}>\n${description}`,
@@ -206,8 +202,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Hunt')) {
                     webhookUsername = 'Hoppity | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/b/b9/SkyBlock_items_skull_hoppity.png';
+                    webhookAvatarURL = 'https://i.imgur.com/9sSA9pM.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockHunt}>\n${description}`,
@@ -223,8 +218,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Happy New Year Event')) {
                     webhookUsername = 'New Year | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/7/71/SkyBlock_items_enchanted_cake.gif';
+                    webhookAvatarURL = 'https://i.imgur.com/OdDtvW0.gif';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockNewYear}>\n${description}`,
@@ -240,8 +234,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Jerrys Workshop Event')) {
                     webhookUsername = 'Jerrys Workshop | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/3/3d/SkyBlock_items_green_gift.png';
+                    webhookAvatarURL = 'https://i.imgur.com/6Hqh9mt.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSeasonOfJerry}>\n${description}`,
@@ -257,8 +250,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Jerrys Workshop Open')) {
                     webhookUsername = 'Jerrys Workshop | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/3/3d/SkyBlock_items_green_gift.png';
+                    webhookAvatarURL = 'https://i.imgur.com/6Hqh9mt.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockJerryWorkshop}>\n${description}`,
@@ -274,8 +266,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Spooky Event')) {
                     webhookUsername = 'Spooky | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/6/62/SkyBlock_items_purple_candy.png';
+                    webhookAvatarURL = 'https://i.imgur.com/Q6wh1Np.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSpooky}>\n${description}`,
@@ -306,8 +297,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mayor Election')) {
                     webhookUsername = 'Mayor Election | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://static.wikia.nocookie.net/hypixel-skyblock/images/6/65/Jukebox.png/revision/latest?cb=20210615213139';
+                    webhookAvatarURL = 'https://i.imgur.com/BQQyVrV.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockElection}>\n${description}`,
@@ -323,8 +313,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Fishing Festival')) {
                     webhookUsername = 'Fishing Festival | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/2/20/SkyBlock_items_enchanted_fishing_rod.gif';
+                    webhookAvatarURL = 'https://i.imgur.com/1y2guS6.gif';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
@@ -340,8 +329,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mythological')) {
                     webhookUsername = 'Mythological | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/a/ab/SkyBlock_items_pet_skin_griffin_reindrake.gif';
+                    webhookAvatarURL = 'https://i.imgur.com/W2OC7dQ.gif';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockMythological}>\n${description}`,
@@ -357,8 +345,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (embedTitle?.includes('Mining')) {
                     webhookUsername = 'Mining | Skyblock Time';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/b/be/SkyBlock_items_perfect_jasper_gem.png';
+                    webhookAvatarURL = 'https://i.imgur.com/VNOy5sz.png';
 
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFiesta}>\n${description}`,
@@ -388,8 +375,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 );
 
                 const webhookUsername = 'Skyblock Version (by Cowshed)';
-                const webhookAvatarURL =
-                    'https://wiki.hypixel.net/images/8/89/SkyBlock_icons_crit_damage.png';
+                const webhookAvatarURL = 'https://i.imgur.com/yYNWd3D.png';
 
                 const messageEdit = message;
                 messageEdit.content = '';
@@ -412,8 +398,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 );
 
                 const webhookUsername = 'Mining Cult';
-                const webhookAvatarURL =
-                    'https://wiki.hypixel.net/images/b/be/SkyBlock_items_perfect_jasper_gem.png';
+                const webhookAvatarURL = 'https://i.imgur.com/VNOy5sz.png';
 
                 if (
                     [
@@ -457,8 +442,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 if (message.content.includes('@SkyBlock Fire Sale')) {
                     webhookUsername = 'SkyBlock Fire Sale (by Cowshed)';
-                    webhookAvatarURL =
-                        'https://wiki.hypixel.net/images/4/42/SkyBlock_items_enchanted_emerald.gif';
+                    webhookAvatarURL = 'https://i.imgur.com/AP2j4Gi.gif';
 
                     fixMention = fixMention.replace(
                         '@SkyBlock Fire Sale',
