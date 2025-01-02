@@ -32,6 +32,7 @@ export interface ConfigData {
     NineHead: {
         serverMention: string;
         nineHeadServer: string;
+        webhook: string;
         channelNewsMention: {
             skyblockNews: string;
             skyblockChangeVersion: string;

@@ -6,6 +6,7 @@
     "NineHead": {
         "serverMention": "1240785113898418256",
         "nineHeadServer": "1240785113898418256",
+        "webhook": "https://discord.com/api/webhooks/1324475292076609736/jtnULBX2dEmgqeFMbaGJckpcU3nTp-cGVYWvnpLfRs9vveVcKYGoOX2COPPJR5RsfRkK",
 
         "channelNewsMention": {
             "skyblockNews": "1323910111516692651",
@@ -17,8 +18,8 @@
         },
 
         "gameChannel": {
-            "skyblock": "1323917142126497832",
-            "dbd": "1323917142126497832"
+            "skyblock": "1324475259071758387",
+            "dbd": "1324475259071758387"
         },
 
         "pingRole": {

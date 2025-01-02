@@ -1,10 +1,46 @@
-import { Attachment, Client, Collection, Message } from 'discord.js';
+import {
+    Attachment,
+    Client,
+    Collection,
+    Embed,
+    Message,
+    WebhookClient,
+} from 'discord.js';
 import { EventHandler } from './EventHandler';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
 
 export class NineHeadMention implements EventHandler<'Message'> {
-    sendMessageRepost(message: Message, channelId: string, client: Client) {
+    async sendWebHook(
+        content: string,
+        username: string,
+        avatarURL: string,
+        channelId: string,
+        attachment: Collection<string, Attachment> | null = null,
+        embed: Embed[],
+    ) {
+        const NineHead = Config.getConfigLocal().NineHead;
+
+        const [id, token] = NineHead.webhook.split('/').slice(5);
+        const webhookClient = new WebhookClient({ id, token });
+
+        await webhookClient.send({
+            content,
+            username,
+            avatarURL,
+            threadId: channelId,
+            files: attachment?.map((a) => a),
+            embeds: embed,
+        });
+    }
+
+    sendMessageRepost(
+        message: Message,
+        channelId: string,
+        client: Client,
+        webhookUsername = '',
+        webhookAvatarURL = '',
+    ) {
         const NineHead = Config.getConfigLocal().NineHead;
 
         const guild = client.guilds.cache.get(NineHead.nineHeadServer);
@@ -14,6 +50,18 @@ export class NineHeadMention implements EventHandler<'Message'> {
         if (!channel) return;
 
         if (channel.isTextBased()) {
+            if (NineHead.webhook) {
+                void this.sendWebHook(
+                    message.content,
+                    webhookUsername,
+                    webhookAvatarURL,
+                    channelId,
+                    message.attachments,
+                    message.embeds,
+                );
+                return;
+            }
+
             void channel.send({
                 content: message.content,
                 files: message.attachments.map((a) => a),
@@ -27,6 +75,8 @@ export class NineHeadMention implements EventHandler<'Message'> {
         attachment: Collection<string, Attachment> | null,
         channelId: string,
         client: Client,
+        webhookUsername = '',
+        webhookAvatarURL = '',
     ) {
         const NineHead = Config.getConfigLocal().NineHead;
 
@@ -37,6 +87,17 @@ export class NineHeadMention implements EventHandler<'Message'> {
         if (!channel) return;
 
         if (channel.isTextBased()) {
+            if (NineHead.webhook) {
+                void this.sendWebHook(
+                    message,
+                    webhookUsername,
+                    webhookAvatarURL,
+                    channelId,
+                    attachment,
+                    [],
+                );
+                return;
+            }
             void channel.send({
                 content: message,
                 files: attachment?.map((a) => a),
@@ -45,7 +106,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
     }
 
     execute(message: Message): void {
-        if (!message.author.bot) return;
+        // if (!message.author.bot) return;
 
         const guildId = message.guild?.id;
         const channelId = message.channel.id;
@@ -60,6 +121,10 @@ export class NineHeadMention implements EventHandler<'Message'> {
             case NineHead.channelNewsMention.dbdCode: {
                 Logger.info('NineHeadMention', 'DBD Code detected');
 
+                const webhookUsername = 'Code | Dead By Daylight';
+                const webhookAvatarURL =
+                    'https://static.wikia.nocookie.net/deadbydaylight_gamepedia_en/images/f/f7/IconHelp_bloodpoints.png/revision/latest?cb=20200715193808';
+
                 const fixMention = message.content.replace(
                     '@Code Notification',
                     `<@&${NineHead.pingRole.dbdCodePing}>`,
@@ -70,12 +135,19 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     message.attachments,
                     NineHead.gameChannel.dbd,
                     message.client,
+
+                    webhookUsername,
+                    webhookAvatarURL,
                 );
                 break;
             }
             case NineHead.channelNewsMention.dbdNews: {
                 Logger.info('NineHeadMention', 'DBD News detected');
                 const messageEdit = message;
+
+                const webhookUsername = 'Dead By Daylight';
+                const webhookAvatarURL =
+                    'https://us.v-cdn.net/6030815/uploads/J9YMAWL8FNCK/pynj3akid4e1.jpg';
 
                 if (messageEdit.embeds.length > 0) {
                     if (
@@ -99,12 +171,9 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     messageEdit,
                     NineHead.gameChannel.dbd,
                     message.client,
-                );
-                this.sendMessage(
-                    '```diff\n- Mensagem do servidor DBDLeaks```',
-                    null,
-                    NineHead.gameChannel.dbd,
-                    message.client,
+
+                    webhookUsername,
+                    webhookAvatarURL,
                 );
                 break;
             }
@@ -114,122 +183,191 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const embedTitle = message.embeds[0].title;
                 const description = `> ${message.embeds[0].description ?? ''}`;
 
+                let webhookUsername = 'Skyblock Time';
+                let webhookAvatarURL =
+                    'https://wiki.hypixel.net/images/b/b6/SkyBlock_items_clock_animated.gif';
+
                 if (embedTitle?.includes('Dark Auction')) {
+                    webhookUsername = 'Dark Auction | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/e/ed/SkyBlock_sprite_npcs_sirius.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockDarkAuction}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Hunt')) {
+                    webhookUsername = 'Hoppity | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/b/b9/SkyBlock_items_skull_hoppity.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockHunt}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Happy New Year Event')) {
+                    webhookUsername = 'New Year | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/7/71/SkyBlock_items_enchanted_cake.gif';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockNewYear}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Jerrys Workshop Event')) {
+                    webhookUsername = 'Jerrys Workshop | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/3/3d/SkyBlock_items_green_gift.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSeasonOfJerry}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Jerrys Workshop Open')) {
+                    webhookUsername = 'Jerrys Workshop | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/3/3d/SkyBlock_items_green_gift.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockJerryWorkshop}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Spooky Event')) {
+                    webhookUsername = 'Spooky | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/6/62/SkyBlock_items_purple_candy.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSpooky}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Traveling Zoo')) {
+                    webhookUsername = 'Traveling Zoo | Skyblock Time';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockTravellingZoo}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Mayor Election')) {
+                    webhookUsername = 'Mayor Election | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://static.wikia.nocookie.net/hypixel-skyblock/images/6/65/Jukebox.png/revision/latest?cb=20210615213139';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockElection}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Fishing Festival')) {
-                    this.sendMessage(
-                        `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
-                        message.attachments,
-                        NineHead.gameChannel.skyblock,
-                        message.client,
-                    );
-                    return;
-                }
+                    webhookUsername = 'Fishing Festival | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/2/20/SkyBlock_items_enchanted_fishing_rod.gif';
 
-                if (embedTitle?.includes('Fishing Festival')) {
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Mythological')) {
+                    webhookUsername = 'Mythological | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/a/ab/SkyBlock_items_pet_skin_griffin_reindrake.gif';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockMythological}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
 
                 if (embedTitle?.includes('Mining')) {
+                    webhookUsername = 'Mining | Skyblock Time';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/b/be/SkyBlock_items_perfect_jasper_gem.png';
+
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFiesta}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                     return;
                 }
@@ -249,6 +387,10 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     'SkyBlock Change Version detected',
                 );
 
+                const webhookUsername = 'Skyblock Version (by Cowshed)';
+                const webhookAvatarURL =
+                    'https://wiki.hypixel.net/images/8/89/SkyBlock_icons_crit_damage.png';
+
                 const messageEdit = message;
                 messageEdit.content = '';
 
@@ -256,6 +398,9 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     messageEdit,
                     NineHead.gameChannel.skyblock,
                     message.client,
+
+                    webhookUsername,
+                    webhookAvatarURL,
                 );
                 break;
             }
@@ -265,6 +410,11 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     'NineHeadMention',
                     'SkyBlock Mining Fiesta detected',
                 );
+
+                const webhookUsername = 'Mining Cult';
+                const webhookAvatarURL =
+                    'https://wiki.hypixel.net/images/b/be/SkyBlock_items_perfect_jasper_gem.png';
+
                 if (
                     [
                         'Cole Fiestas',
@@ -276,18 +426,24 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     )
                 ) {
                     this.sendMessage(
-                        `<@&${NineHead.pingRole.skyblockFiesta}>\n${message.content}` +
-                            '\n|| Fonte: Mining Cult ||',
+                        `<@&${NineHead.pingRole.skyblockFiesta}>\n${message.content}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
                     );
                 }
                 break;
             }
             case NineHead.channelNewsMention.skyblockNews: {
                 Logger.info('NineHeadMention', 'SkyBlock News detected');
-                const fixMention = message.content
+
+                let webhookUsername = 'SkyBlock News (by Cowshed)';
+                let webhookAvatarURL = 'https://i.imgur.com/Bl387ue.jpeg';
+
+                let fixMention = message.content
                     .replace(
                         '@SkyBlock News',
                         `<@&${NineHead.pingRole.skyblockNews}>`,
@@ -296,18 +452,28 @@ export class NineHeadMention implements EventHandler<'Message'> {
                         '@SkyBlock Status',
                         `<@&${NineHead.pingRole.skyblockNews}>`,
                     )
-                    .replace(
-                        '@SkyBlock Fire Sale',
-                        `<@&${NineHead.pingRole.skyblockFireSale}>`,
-                    )
                     .replace('@SkyBlock Tidbits', '')
                     .replace('@SkyBlock Leaks', '');
 
+                if (message.content.includes('@SkyBlock Fire Sale')) {
+                    webhookUsername = 'SkyBlock Fire Sale (by Cowshed)';
+                    webhookAvatarURL =
+                        'https://wiki.hypixel.net/images/4/42/SkyBlock_items_enchanted_emerald.gif';
+
+                    fixMention = fixMention.replace(
+                        '@SkyBlock Fire Sale',
+                        `<@&${NineHead.pingRole.skyblockFireSale}>`,
+                    );
+                }
+
                 this.sendMessage(
-                    fixMention + '\n|| Fonte: Server Cowshed ||',
+                    fixMention,
                     message.attachments,
                     NineHead.gameChannel.skyblock,
                     message.client,
+
+                    webhookUsername,
+                    webhookAvatarURL,
                 );
 
                 break;

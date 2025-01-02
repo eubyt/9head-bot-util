@@ -6,7 +6,7 @@
     "NineHead": {
         "serverMention": "1240785113898418256",
         "nineHeadServer": "1026324664051572847",
-
+        "webhook": "https://discord.com/api/webhooks/1324469150978015302/nP4jmNL39ZgbPsMrpE5dbJRgIM91pxrI9kScVzlumkMIN4bKpxALdNWXyxJJCA-lcXg_",
         "channelNewsMention": {
             "skyblockNews": "1323910111516692651",
             "skyblockChangeVersion": "1323922591307796550",
