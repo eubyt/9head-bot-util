@@ -111,11 +111,8 @@ export class NineHeadMention implements EventHandler<'Message'> {
             case NineHead.channelNewsMention.skyblockCalendar: {
                 Logger.info('NineHeadMention', 'Calendar detected');
 
-                console.log(message.embeds[0].title);
                 const embedTitle = message.embeds[0].title;
-                const description = message.embeds[0].description;
-
-                if (description === null) return;
+                const description = `> ${message.embeds[0].description ?? ''}`;
 
                 if (embedTitle?.includes('Dark Auction')) {
                     this.sendMessage(
@@ -246,17 +243,22 @@ export class NineHeadMention implements EventHandler<'Message'> {
 
                 break;
             }
-            case NineHead.channelNewsMention.skyblockChangeVersion:
+            case NineHead.channelNewsMention.skyblockChangeVersion: {
                 Logger.info(
                     'NineHeadMention',
                     'SkyBlock Change Version detected',
                 );
+
+                const messageEdit = message;
+                messageEdit.content = '';
+
                 this.sendMessageRepost(
-                    message,
+                    messageEdit,
                     NineHead.gameChannel.skyblock,
                     message.client,
                 );
                 break;
+            }
 
             case NineHead.channelNewsMention.skyblockMiningFiesta: {
                 Logger.info(
@@ -275,7 +277,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 ) {
                     this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFiesta}>\n${message.content}` +
-                            '```diff\n- Mensagem do Mining Cult\n```',
+                            '\n|| Fonte: Mining Cult ||',
                         message.attachments,
                         NineHead.gameChannel.skyblock,
                         message.client,
@@ -302,7 +304,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     .replace('@SkyBlock Leaks', '');
 
                 this.sendMessage(
-                    fixMention + '```diff\n- Mensagem do servidor Cowshed\n```',
+                    fixMention + '\n|| Fonte: Server Cowshed ||',
                     message.attachments,
                     NineHead.gameChannel.skyblock,
                     message.client,
