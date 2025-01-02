@@ -38,11 +38,6 @@ export async function logEditedMessage(
             return;
         }
 
-        // Ingore bots
-        if (oldMessage.author?.bot) {
-            return;
-        }
-
         await sendLogMessage('', thread, header, details);
 
         if (!partial) {

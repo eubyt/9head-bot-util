@@ -145,7 +145,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             await webhook.send({
                 content: message.content,
                 username: message.member?.displayName ?? 'Usuário',
-                avatarURL: message.author.displayAvatarURL(),
+                avatarURL: message.author.avatarURL() ?? undefined,
             });
 
             // Adicionar o cargo ao membro atual

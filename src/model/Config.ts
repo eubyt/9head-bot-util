@@ -36,6 +36,7 @@ export interface ConfigData {
             skyblockNews: string;
             skyblockChangeVersion: string;
             skyblockCalendar: string;
+            skyblockMiningFiesta: string;
             dbdNews: string;
             dbdCode: string;
         };

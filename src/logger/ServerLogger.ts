@@ -84,7 +84,8 @@ export class ServerLogger {
                 partial = true;
             }
 
-            if (!oldMessage.guild || !newMessage.guild) return;
+            if (!oldMessage.guild || !newMessage.guild || oldMessage.author.bot)
+                return;
 
             const config = await Config.getConfig(newMessage.guild.id);
             if (config === undefined) return;

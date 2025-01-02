@@ -258,6 +258,31 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 );
                 break;
 
+            case NineHead.channelNewsMention.skyblockMiningFiesta: {
+                Logger.info(
+                    'NineHeadMention',
+                    'SkyBlock Mining Fiesta detected',
+                );
+                if (
+                    [
+                        'Cole Fiestas',
+                        'Jerry Fiestas',
+                        'Mining Fiestas',
+                        'Foxy Fiesta',
+                    ].some((e) =>
+                        message.content.toLowerCase().includes(e.toLowerCase()),
+                    )
+                ) {
+                    this.sendMessage(
+                        `<@&${NineHead.pingRole.skyblockFiesta}>\n${message.content}` +
+                            '```diff\n- Mensagem do Mining Cult\n```',
+                        message.attachments,
+                        NineHead.gameChannel.skyblock,
+                        message.client,
+                    );
+                }
+                break;
+            }
             case NineHead.channelNewsMention.skyblockNews: {
                 Logger.info('NineHeadMention', 'SkyBlock News detected');
                 const fixMention = message.content
