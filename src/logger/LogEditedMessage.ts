@@ -42,19 +42,14 @@ export async function logEditedMessage(
 
         if (!partial) {
             await sendLogMessage(
-                newContent,
+                oldContent,
                 thread,
                 '',
-                '```diff\n+ [ANTIGO] ' + oldContent + '\n```',
+                '```diff\n- [ANTIGO]```',
             );
         }
 
-        await sendLogMessage(
-            newContent,
-            thread,
-            '',
-            '```diff\n+ [NOVO] ' + newContent + '\n```',
-        );
+        await sendLogMessage(newContent, thread, '', '```diff\n+ [NOVO]```');
     } catch (error: unknown) {
         Logger.error(
             'Server Log',
