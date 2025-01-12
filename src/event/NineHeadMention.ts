@@ -49,7 +49,8 @@ export class NineHeadMention implements EventHandler<'Message'> {
         const channel = guild.channels.cache.get(channelId);
         if (!channel) return;
 
-        if (channel.isTextBased()) {
+        if (channel.isTextBased()) 
+            try {
             if (NineHead.webhook) {
                 void this.sendWebHook(
                     message.content,
@@ -61,6 +62,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 );
                 return;
             }
+            
 
             void channel.send({
                 content: message.content,
@@ -364,6 +366,9 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     message.attachments,
                     NineHead.gameChannel.skyblock,
                     message.client,
+
+                    webhookUsername,
+                    webhookAvatarURL,
                 );
 
                 break;
