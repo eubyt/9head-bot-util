@@ -21,7 +21,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
     }
 
     async execute(message: Message): Promise<void> {
-        const fmRegexCommand = /\.(f|gw|r|c|u)(\s?.*)?/;
+        const fmRegexCommand = /\.(f|gw|r|c|u|judge)(\s?.*)?/;
 
         if (message.author.bot || !message.guildId) return;
 
