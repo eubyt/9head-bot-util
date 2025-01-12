@@ -34,7 +34,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
         });
     }
 
-    sendMessageRepost(
+    async sendMessageRepost(
         message: Message,
         channelId: string,
         client: Client,
@@ -46,11 +46,10 @@ export class NineHeadMention implements EventHandler<'Message'> {
         const guild = client.guilds.cache.get(NineHead.nineHeadServer);
         if (!guild) return;
 
-        const channel = guild.channels.cache.get(channelId);
+        const channel = await guild.channels.fetch(channelId);
         if (!channel) return;
 
-        if (channel.isTextBased()) 
-            try {
+        if (channel.isTextBased()) {
             if (NineHead.webhook) {
                 void this.sendWebHook(
                     message.content,
@@ -62,7 +61,6 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 );
                 return;
             }
-            
 
             void channel.send({
                 content: message.content,
@@ -72,7 +70,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
         }
     }
 
-    sendMessage(
+    async sendMessage(
         message: string,
         attachment: Collection<string, Attachment> | null,
         channelId: string,
@@ -85,7 +83,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
         const guild = client.guilds.cache.get(NineHead.nineHeadServer);
         if (!guild) return;
 
-        const channel = guild.channels.cache.get(channelId);
+        const channel = await guild.channels.fetch(channelId);
         if (!channel) return;
 
         if (channel.isTextBased()) {
@@ -108,7 +106,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
     }
 
     execute(message: Message): void {
-        if (!message.author.bot) return;
+        // if (!message.author.bot) return;
 
         const guildId = message.guild?.id;
         const channelId = message.channel.id;
@@ -131,7 +129,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     `<@&${NineHead.pingRole.dbdCodePing}>`,
                 );
 
-                this.sendMessage(
+                void this.sendMessage(
                     fixMention,
                     message.attachments,
                     NineHead.gameChannel.dbd,
@@ -167,7 +165,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     }
                 }
 
-                this.sendMessageRepost(
+                void this.sendMessageRepost(
                     messageEdit,
                     NineHead.gameChannel.dbd,
                     message.client,
@@ -190,7 +188,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Dark Auction | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/RuKdJu2.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockDarkAuction}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -206,7 +204,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Hoppity | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/9sSA9pM.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockHunt}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -222,7 +220,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'New Year | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/OdDtvW0.gif';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockNewYear}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -238,7 +236,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Jerrys Workshop | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/6Hqh9mt.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSeasonOfJerry}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -254,7 +252,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Jerrys Workshop | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/6Hqh9mt.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockJerryWorkshop}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -270,7 +268,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Spooky | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/Q6wh1Np.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockSpooky}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -285,7 +283,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 if (embedTitle?.includes('Traveling Zoo')) {
                     webhookUsername = 'Traveling Zoo | Skyblock Time';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockTravellingZoo}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -301,7 +299,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Mayor Election | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/BQQyVrV.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockElection}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -317,7 +315,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Fishing Festival | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/1y2guS6.gif';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFestivel}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -333,7 +331,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Mythological | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/W2OC7dQ.gif';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockMythological}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -349,7 +347,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     webhookUsername = 'Mining | Skyblock Time';
                     webhookAvatarURL = 'https://i.imgur.com/VNOy5sz.png';
 
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFiesta}>\n${description}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -361,7 +359,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     return;
                 }
 
-                this.sendMessage(
+                void this.sendMessage(
                     description,
                     message.attachments,
                     NineHead.gameChannel.skyblock,
@@ -385,7 +383,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const messageEdit = message;
                 messageEdit.content = '';
 
-                this.sendMessageRepost(
+                void this.sendMessageRepost(
                     messageEdit,
                     NineHead.gameChannel.skyblock,
                     message.client,
@@ -415,7 +413,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                         message.content.toLowerCase().includes(e.toLowerCase()),
                     )
                 ) {
-                    this.sendMessage(
+                    void this.sendMessage(
                         `<@&${NineHead.pingRole.skyblockFiesta}>\n${message.content}`,
                         message.attachments,
                         NineHead.gameChannel.skyblock,
@@ -455,7 +453,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                     );
                 }
 
-                this.sendMessage(
+                void this.sendMessage(
                     fixMention,
                     message.attachments,
                     NineHead.gameChannel.skyblock,
