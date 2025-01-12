@@ -92,6 +92,23 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             const counterCurrent = config.CounterChannelAmount || 0;
             const roleId = config.CounterChannelRule;
             let warnMessage = undefined;
+            const role = message.channel.guild.roles.cache.get(roleId);
+
+            if (!role) {
+                Logger.error('Counter Channel', 'Cargo não encontrado');
+                return;
+            }
+
+            if (
+                message.member?.roles.cache.some((role) => role.id === roleId)
+            ) {
+                warnMessage = await message.channel.send({
+                    content: Config.getLang('channelEvent.counter_same_person'),
+                    reply: { messageReference: message.id },
+                });
+            }
+
+            // Verificar se a pessoa já possui o role
 
             if (isNaN(Number(message.content))) {
                 warnMessage = await message.channel.send({
@@ -150,12 +167,6 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
             // Adicionar o cargo ao membro atual
             // Loading members with the role
-
-            const role = message.channel.guild.roles.cache.get(roleId);
-            if (!role) {
-                Logger.error('Counter Channel', 'Cargo não encontrado');
-                return;
-            }
 
             const membersWithRole = role.members;
             for (const [, member] of membersWithRole) {

@@ -1,6 +1,7 @@
 {
     "channelEvent": {
         "warn_channel_fmbot": "Você deve utilizar o canal {{channel}} para interagir com o FMbot.",
+        "counter_same_person": "Você já contou! Agora, você deve esperar por outra pessoa.",
         "counter_number_invalid": "O número fornecido não é válido. Por favor, forneça um número válido.",
         "counter_next_number": "O próximo número é `{{nextNumber}}`."
     },
