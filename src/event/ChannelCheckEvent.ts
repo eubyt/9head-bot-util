@@ -22,7 +22,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
     async execute(message: Message): Promise<void> {
         const fmRegexCommand = /\.(f|gw|r|c|u|judge)(\s?.*)?/;
-        const command = message.content.split(' ')[0];
+        const chatCommand = message.content.split(' ')[0];
 
         if (message.author.bot || !message.guildId) return;
 
@@ -39,7 +39,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
         // Apenas comandos de FMbot são permitidos
         if (config.FmBotChannel === message.channelId) {
-            if (!fmRegexCommand.test(message.content)) {
+            if (!fmRegexCommand.test(chatCommand)) {
                 void this.deleteMessage(message);
                 return;
             }
@@ -50,7 +50,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
             config.FmBotChannel !== message.channelId &&
             config.CommandChannel === message.channelId
         ) {
-            if (fmRegexCommand.test(message.content)) {
+            if (fmRegexCommand.test(chatCommand)) {
                 try {
                     await message.react('❌');
 
@@ -62,6 +62,8 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                         ).replace('{{channel}}', `<#${config.FmBotChannel}>`),
                         reply: { messageReference: message.id },
                     });
+
+                    console.log(chatCommand);
 
                     setTimeout(() => {
                         warningMessage.delete().catch(() => {
