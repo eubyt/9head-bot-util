@@ -63,8 +63,6 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                         reply: { messageReference: message.id },
                     });
 
-                    console.log(chatCommand);
-
                     setTimeout(() => {
                         warningMessage.delete().catch(() => {
                             Logger.error(
