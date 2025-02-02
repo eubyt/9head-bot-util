@@ -19,7 +19,7 @@ export class FixLinks implements EventHandler<'Message'> {
             let correctedLink = `https://fxtwitter.com/${username}/status/${statusId}`;
             if (media) correctedLink += media;
 
-            const markdownLink = `[FxTwitter • ${username}](${correctedLink}/pt)`;
+            const markdownLink = `[FxTwitter • ${username}](${correctedLink})`;
 
             await message.suppressEmbeds(true);
 
