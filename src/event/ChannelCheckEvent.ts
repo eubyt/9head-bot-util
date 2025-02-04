@@ -23,7 +23,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
     async execute(message: Message): Promise<void> {
         const fmRegexCommand = /\.(f|gw|r|c|u|judge)(\s?.*)?/;
         const karutaCommand = /\k(\s?.*)?/;
-        const chatCommand = message.content.split(' ')[0];
+        const chatCommand = message.content.split(' ')[0].toLowerCase();
 
         if (message.author.bot || !message.guildId) return;
 
