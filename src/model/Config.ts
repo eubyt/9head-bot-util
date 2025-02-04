@@ -274,6 +274,7 @@ export class Config {
             PrivateVoiceChannel: [],
             CommandChannel: 'null',
             FmBotChannel: 'null',
+            KarutaChannel: 'null',
             CounterChannel: 'null',
             CounterChannelRule: 'null',
             CounterChannelAmount: 0,
