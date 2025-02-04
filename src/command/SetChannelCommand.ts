@@ -101,6 +101,11 @@ export class SetChannelCommand extends CommandCreator {
 
         if (
             data.FmBotChannel === channel.id ||
+            data.FishingChannel === channel.id ||
+            data.KarutaChannel === channel.id ||
+            data.NivelChannel === channel.id ||
+            data.LoggerChannel === channel.id ||
+            data.BanLoggerChannel === channel.id ||
             data.CommandChannel === channel.id ||
             data.CounterChannel === channel.id
         ) {
