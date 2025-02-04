@@ -22,6 +22,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
     async execute(message: Message): Promise<void> {
         const fmRegexCommand = /\.(f|gw|r|c|u|judge)(\s?.*)?/;
+        const karutaCommand = /\k!(\s?.*)?/;
         const chatCommand = message.content.split(' ')[0];
 
         if (message.author.bot || !message.guildId) return;
@@ -35,6 +36,14 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
         ) {
             void this.deleteMessage(message);
             return;
+        }
+
+        // Apenas comandos da Karuta são permitidos
+        if (config.KarutaChannel === message.channelId) {
+            if (!karutaCommand.test(chatCommand)) {
+                void this.deleteMessage(message);
+                return;
+            }
         }
 
         // Apenas comandos de FMbot são permitidos

@@ -35,6 +35,10 @@ export class SetChannelCommand extends CommandCreator {
                     value: 'FishingChannel',
                 },
                 {
+                    name: 'Karuta',
+                    value: 'KarutaChannel',
+                },
+                {
                     name: 'Nivel',
                     value: 'NivelChannel',
                 },
@@ -125,6 +129,11 @@ export class SetChannelCommand extends CommandCreator {
             case 'FishingChannel':
                 await db.update({
                     FishingChannel: channel.id,
+                });
+                break;
+            case 'KarutaChannel':
+                await db.update({
+                    KarutaChannel: channel.id,
                 });
                 break;
             case 'NivelChannel':
