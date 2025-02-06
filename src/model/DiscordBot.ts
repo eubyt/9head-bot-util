@@ -122,7 +122,7 @@ export class DiscordBot {
             const randomEmoteId =
                 CUSTOM_EMOTES[Math.floor(Math.random() * CUSTOM_EMOTES.length)];
 
-            const shouldReact = Math.random() < 0.05;
+            const shouldReact = Math.random() < 0.01;
 
             if (shouldReact) await message.react(randomEmoteId);
         }
