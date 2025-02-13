@@ -2,6 +2,7 @@ import {
     AttachmentBuilder,
     AuditLogEvent,
     EmbedBuilder,
+    PermissionFlagsBits,
     ThreadChannel,
     VoiceState,
 } from 'discord.js';
@@ -11,7 +12,9 @@ export async function logVoice(
     oldState: VoiceState,
     newState: VoiceState,
 ) {
-    const user = newState.member?.user ?? oldState.member?.user;
+    const member = newState.member ?? oldState.member;
+    const user = member?.user;
+
     if (!user) return;
 
     const newAvatarUrl = user.displayAvatarURL({ size: 1024 });
@@ -19,9 +22,15 @@ export async function logVoice(
         name: 'avatar.png',
     });
 
+    const canViewThread = thread
+        .permissionsFor(member)
+        .has(PermissionFlagsBits.ViewChannel);
+
+    const content = canViewThread ? member.displayName : `<@${user.id}>`;
+
     const sendMessage = async () => {
         await thread.send({
-            content: `<@${user.id}>`,
+            content,
             embeds: [embed],
             files: [avatarAttachment],
             flags: [4096],
