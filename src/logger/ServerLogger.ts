@@ -35,17 +35,22 @@ export async function sendLogMessage(
             const newMessage = chunk.replace(/```/g, '"');
 
             if (chunks.indexOf(chunk) === 0) {
-                await thread.send(
-                    `${header}\n${details}\`\`\`${newMessage}\n\`\`\``,
-                );
+                await thread.send({
+                    content: `${header}\n${details}\`\`\`${newMessage}\n\`\`\``,
+                    flags: [4096],
+                });
             } else {
-                await thread.send(`\`\`\`${newMessage}\n\`\`\``);
+                await thread.send({
+                    content: `\`\`\`${newMessage}\n\`\`\``,
+                    flags: [4096],
+                });
             }
         }
     } else {
-        await thread.send(
-            `${header}\n${details}${mensagem.length > 0 ? `\`\`\`${mensagem}\n\`\`\`` : ''}`,
-        );
+        await thread.send({
+            content: `${header}\n${details}${mensagem.length > 0 ? `\`\`\`${mensagem}\n\`\`\`` : ''}`,
+            flags: [4096],
+        });
     }
 }
 

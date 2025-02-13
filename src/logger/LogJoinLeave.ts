@@ -100,6 +100,7 @@ export async function logJoinLeave(
             content: `<@${authorId}>`,
             embeds: [embed],
             files: [avatarAttachment],
+            flags: [4096],
         });
     } catch (error) {
         Logger.error('Server Log', 'Erro em gerar log de entrada/saída.');

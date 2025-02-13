@@ -28,6 +28,7 @@ export async function logMemberUpdate(
             content,
             embeds: [embed],
             files: [avatarAttachment],
+            flags: [4096],
         });
     };
 

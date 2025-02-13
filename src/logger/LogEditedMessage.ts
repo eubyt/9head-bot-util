@@ -1,4 +1,9 @@
-import { ThreadChannel, Message, PartialMessage } from 'discord.js';
+import {
+    ThreadChannel,
+    Message,
+    PartialMessage,
+    PermissionFlagsBits,
+} from 'discord.js';
 import { Logger } from '../model/Logger';
 import { sendLogMessage } from './ServerLogger';
 
@@ -14,6 +19,13 @@ export async function logEditedMessage(
         const author = oldMessage.author?.tag ?? 'Autor desconhecido';
         const authorId = oldMessage.author?.id ?? 'ID desconhecido';
 
+        const guildMember = thread.guild.members.cache.get(authorId);
+        const canViewThread = guildMember
+            ? thread
+                  .permissionsFor(guildMember)
+                  .has(PermissionFlagsBits.ViewChannel)
+            : false;
+
         let channelName = 'Canal desconhecido';
         let channelId = 'ID desconhecido';
         if ('name' in oldMessage.channel) {
@@ -25,7 +37,9 @@ export async function logEditedMessage(
             ? new Date(oldMessage.createdTimestamp).toISOString()
             : 'Data desconhecida';
 
-        const header = `• **[EDITADO]** | Canal: <#${channelId}> | Autor: <@${authorId}> | Editado há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
+        const header = `• **[EDITADO]** | Canal: <#${channelId}> | Autor: ${
+            canViewThread ? `<@${authorId}>` : author
+        } | Editado há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff
 - Data/Hora:   ${timestamp}

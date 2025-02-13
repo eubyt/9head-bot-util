@@ -52,6 +52,7 @@ export function logUserUpdate(
                         content,
                         embeds: [embed],
                         files: [avatarAttachment],
+                        flags: [4096],
                     });
                 }
             });

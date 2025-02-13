@@ -2,6 +2,7 @@ import {
     AuditLogEvent,
     Message,
     PartialMessage,
+    PermissionFlagsBits,
     ThreadChannel,
 } from 'discord.js';
 import { Logger } from '../model/Logger';
@@ -15,6 +16,13 @@ export async function logDeletedMessage(
         const content = message.content ?? '[Mensagem sem conteúdo]';
         const author = message.author?.tag ?? 'Autor desconhecido';
         const authorId = message.author?.id ?? 'ID desconhecido';
+
+        const guildMember = thread.guild.members.cache.get(authorId);
+        const canViewThread = guildMember
+            ? thread
+                  .permissionsFor(guildMember)
+                  .has(PermissionFlagsBits.ViewChannel)
+            : false;
 
         let channelName = 'Canal desconhecido';
         let channelId = 'ID desconhecido';
@@ -48,7 +56,9 @@ export async function logDeletedMessage(
             Logger.error('Server Log', 'Erro ao buscar logs de auditoria.');
         }
 
-        const header = `• **[DELETADO]** | Canal: <#${channelId}> | Autor: <@${authorId}> | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
+        const header = `• **[DELETADO]** | Canal: <#${channelId}> | Autor: ${
+            canViewThread ? `<@${authorId}>` : author
+        } | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff
 - Data/Hora:   ${timestamp}
@@ -76,6 +86,7 @@ ${deleter ? `+ Deletada por: ${deleter}\n` : ''}
             await thread.send({
                 content: `\`\`\`Mensagem contém anexos: ${String(message.attachments.size)}\`\`\``,
                 files: message.attachments.map((attachment) => attachment.url),
+                flags: [4096],
             });
         }
     } catch (error: unknown) {
