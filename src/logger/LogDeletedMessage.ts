@@ -57,7 +57,7 @@ export async function logDeletedMessage(
         }
 
         const header = `• **[DELETADO]** | Canal: <#${channelId}> | Autor: ${
-            canViewThread ? `<@${authorId}>` : author
+            canViewThread ? author : `<@${authorId}>`
         } | Deletada há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff

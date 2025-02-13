@@ -38,7 +38,7 @@ export async function logEditedMessage(
             : 'Data desconhecida';
 
         const header = `• **[EDITADO]** | Canal: <#${channelId}> | Autor: ${
-            canViewThread ? `<@${authorId}>` : author
+            canViewThread ? author : `<@${authorId}>`
         } | Editado há: <t:${Math.floor(Date.now() / 1000).toString()}:R>`;
 
         const details = `\`\`\`diff
