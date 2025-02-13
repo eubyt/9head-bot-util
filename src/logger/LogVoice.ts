@@ -26,9 +26,11 @@ export async function logVoice(
         .permissionsFor(member)
         .has(PermissionFlagsBits.ViewChannel);
 
-    const content = canViewThread ? member.displayName : `<@${user.id}>`;
-
     const sendMessage = async () => {
+        const content = canViewThread
+            ? `@${member.displayName}`
+            : `<@${user.id}>`;
+
         await thread.send({
             content,
             embeds: [embed],

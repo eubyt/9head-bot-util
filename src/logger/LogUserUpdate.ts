@@ -4,6 +4,7 @@ import {
     User,
     Client,
     PartialUser,
+    PermissionFlagsBits,
 } from 'discord.js';
 
 export function logUserUpdate(
@@ -38,8 +39,17 @@ export function logUserUpdate(
                     channel.ownerId === client.user?.id
                 ) {
                     const thread = channel;
+                    const guildMember = guild.members.cache.get(newMember.id);
+                    const canViewThread = guildMember
+                        ?.permissionsIn(thread)
+                        .has(PermissionFlagsBits.ViewChannel);
+
+                    const content = canViewThread
+                        ? `@${newMember.displayName}`
+                        : `<@${newMember.id}>`;
+
                     void thread.send({
-                        content: `<@${newMember.id}>`,
+                        content,
                         embeds: [embed],
                         files: [avatarAttachment],
                     });

@@ -3,6 +3,7 @@ import {
     ThreadChannel,
     EmbedBuilder,
     AttachmentBuilder,
+    PermissionFlagsBits,
 } from 'discord.js';
 
 export async function logMemberUpdate(
@@ -14,10 +15,17 @@ export async function logMemberUpdate(
     const avatarAttachment = new AttachmentBuilder(newAvatarUrl, {
         name: 'avatar.png',
     });
+    const canViewThread = thread
+        .permissionsFor(newMember)
+        .has(PermissionFlagsBits.ViewChannel);
 
     const sendMessage = async () => {
+        const content = canViewThread
+            ? `@${newMember.displayName}`
+            : `<@${newMember.id}>`;
+
         await thread.send({
-            content: `<@${newMember.id}>`,
+            content,
             embeds: [embed],
             files: [avatarAttachment],
         });
