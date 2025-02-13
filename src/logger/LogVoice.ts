@@ -24,6 +24,7 @@ export async function logVoice(
             content: `<@${user.id}>`,
             embeds: [embed],
             files: [avatarAttachment],
+            flags: [4096],
         });
     };
 
