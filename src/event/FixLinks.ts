@@ -21,13 +21,12 @@ export class FixLinks implements EventHandler<'Message'> {
 
             const markdownLink = `[FxTwitter • ${username}](${correctedLink})`;
 
-            await message.suppressEmbeds(true);
-
             await message.reply({
                 content: markdownLink,
                 allowedMentions: { repliedUser: false },
             });
 
+            await message.suppressEmbeds(true);
             return;
         }
 
