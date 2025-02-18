@@ -27,7 +27,9 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
         );
 
         // Rename all channels
-        for (const [index, voiceChannel] of allVoiceChannels.entries()) {
+        for (const [index, voiceChannel] of Array.from(
+            allVoiceChannels.values(),
+        ).entries()) {
             const newName = name.replace(
                 '{number}',
                 (Number(index) + 1).toString(),
