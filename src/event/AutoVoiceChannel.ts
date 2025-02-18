@@ -26,6 +26,35 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
             (x) => x.type === ChannelType.GuildVoice,
         );
 
+        // Rename all channels
+        for (const [index, voiceChannel] of allVoiceChannels.entries()) {
+            const newName = name.replace(
+                '{number}',
+                (Number(index) + 1).toString(),
+            );
+
+            if (voiceChannel.name === newName) continue;
+
+            try {
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Renomeando canal: ${voiceChannel.name} -> ${newName}`,
+                );
+
+                await voiceChannel.setName(newName);
+
+                Logger.info(
+                    'AutoVoiceChannel',
+                    `Canal renomeado com sucesso: ${voiceChannel.name} -> ${newName}`,
+                );
+            } catch (e) {
+                Logger.error(
+                    'AutoVoiceChannel',
+                    `Não foi possível renomear o canal ${voiceChannel.name}: ${String(e)}`,
+                );
+            }
+        }
+
         // Lista de canais sem ninguém
         let emptyChannels = allVoiceChannels.filter(
             (x) => x.members.size === 0,
