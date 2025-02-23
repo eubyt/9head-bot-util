@@ -81,6 +81,10 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     emptyChannels = emptyChannels.filter(
                         (x) => x.id !== deleteChannel.id,
                     );
+
+                    if (deleteChannel.name === name.replace('{number}', '1'))
+                        return;
+
                     await deleteChannel.delete();
 
                     Logger.info(
