@@ -1,5 +1,6 @@
 import {
     Attachment,
+    ChannelType,
     Client,
     Collection,
     Embed,
@@ -112,11 +113,20 @@ export class NineHeadMention implements EventHandler<'Message'> {
     }
 
     execute(message: Message): void {
-        // if (!message.author.bot) return;
-
         const guildId = message.guild?.id;
         const channelId = message.channel.id;
         const NineHead = Config.getConfigLocal().NineHead;
+
+        // Verificar se o canal é um canal de anuncio
+        if (
+            message.channel.type === ChannelType.GuildAnnouncement &&
+            message.guild &&
+            message.guild.id === NineHead.nineHeadServer
+        ) {
+            // Anunciar a mensagem
+            void message.crosspost();
+            return;
+        }
 
         // Guilda de notificação
         if (guildId !== NineHead.serverMention) return;
