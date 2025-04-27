@@ -39,6 +39,10 @@ export class SetChannelCommand extends CommandCreator {
                     value: 'KarutaChannel',
                 },
                 {
+                    name: 'Mudae',
+                    value: 'MudaeChannel',
+                },
+                {
                     name: 'Nivel',
                     value: 'NivelChannel',
                 },
@@ -103,6 +107,7 @@ export class SetChannelCommand extends CommandCreator {
             data.FmBotChannel === channel.id ||
             data.FishingChannel === channel.id ||
             data.KarutaChannel === channel.id ||
+            data.MudaeChannel === channel.id ||
             data.NivelChannel === channel.id ||
             data.LoggerChannel === channel.id ||
             data.BanLoggerChannel === channel.id ||
@@ -139,6 +144,11 @@ export class SetChannelCommand extends CommandCreator {
             case 'KarutaChannel':
                 await db.update({
                     KarutaChannel: channel.id,
+                });
+                break;
+            case 'MudaeChannel':
+                await db.update({
+                    MudaeChannel: channel.id,
                 });
                 break;
             case 'NivelChannel':

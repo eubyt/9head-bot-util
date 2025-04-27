@@ -20,6 +20,7 @@ export interface ConfigData {
     CommandChannel: string;
     FmBotChannel: string;
     KarutaChannel: string;
+    MudaeChannel: string;
     CounterChannel: string;
     CounterChannelAmount: number;
     CounterChannelRule: string;
