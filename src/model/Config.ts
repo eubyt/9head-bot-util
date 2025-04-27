@@ -276,6 +276,7 @@ export class Config {
             CommandChannel: 'null',
             FmBotChannel: 'null',
             KarutaChannel: 'null',
+            MudaeChannel: 'null',
             CounterChannel: 'null',
             CounterChannelRule: 'null',
             CounterChannelAmount: 0,
