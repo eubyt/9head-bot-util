@@ -77,30 +77,34 @@ export class CanalPrivadoOcultarCommand extends CommandCreator {
         const { channelName, hidden, permissions } = privateChannelData as {
             channelName: string;
             permissions: string[];
-            hidden: boolean;
         };
 
         if (!guild) return;
-
-        const channel = guild.channels.cache.find(
-            (ch) =>
-                ch.name === channelName && ch.type === ChannelType.GuildVoice,
-        );
-
-        if (channel) {
-            const permissionOverwrites: OverwriteResolvable[] =
-                buildPrivateChannelPermissions(guild, permissions, hidden);
-
-            await (channel as VoiceChannel).permissionOverwrites.set(
-                permissionOverwrites,
-            );
-        }
 
         const newHiddenValue = !hidden;
         try {
             await privateChannelDoc.ref.update({
                 hidden: newHiddenValue,
             });
+
+            const channel = guild.channels.cache.find(
+                (ch) =>
+                    ch.name === channelName &&
+                    ch.type === ChannelType.GuildVoice,
+            );
+
+            if (channel) {
+                const permissionOverwrites: OverwriteResolvable[] =
+                    buildPrivateChannelPermissions(
+                        guild,
+                        permissions,
+                        newHiddenValue,
+                    );
+
+                await (channel as VoiceChannel).permissionOverwrites.set(
+                    permissionOverwrites,
+                );
+            }
 
             const statusMessage = newHiddenValue
                 ? Config.getLang(
