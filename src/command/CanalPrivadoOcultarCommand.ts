@@ -77,6 +77,7 @@ export class CanalPrivadoOcultarCommand extends CommandCreator {
         const { channelName, hidden, permissions } = privateChannelData as {
             channelName: string;
             permissions: string[];
+            hidden: boolean;
         };
 
         if (!guild) return;
