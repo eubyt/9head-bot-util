@@ -212,8 +212,9 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     content:
                         'Bem-vindo ao seu canal privado! Use os seguintes comandos:\n\n' +
                         '</canalprivado-rename:1317440925445787682> para renomear o canal.\n' +
-                        '</canalprivado:1317440925445787681> para adicionar ou remover pessoas.' +
+                        '</canalprivado:1317440925445787681> para adicionar ou remover pessoas.\n' +
                         '</canalprivado-persistencia:1317440925445787680> para tornar o canal persistente (Nunca ser deletado).\n' +
+                        '</canalprivado-ocultar:1317440925445787683> para ocultar o canal.\n' +
                         '\n' +
                         '<@' +
                         userId +
