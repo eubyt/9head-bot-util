@@ -14,6 +14,59 @@ interface VoiceChannelData {
     channelName: string;
     permissions: string[];
     persistente: boolean;
+    hidden: boolean;
+}
+
+export function buildPrivateChannelPermissions(
+    guild: Guild,
+    allowedUsers: string[],
+    hidden = false,
+): OverwriteResolvable[] {
+    const botId = Config.getConfigLocal().Config_Discord_BOT.id;
+
+    return [
+        // Permissões para os usuários permitidos
+        ...allowedUsers.map((id) => ({
+            id,
+            allow: ['ViewChannel', 'Connect'] as PermissionResolvable[],
+        })),
+
+        // Permissões padrão (everyone)
+        {
+            id: guild.roles.everyone.id,
+            allow: hidden ? [] : (['ViewChannel'] as PermissionResolvable[]),
+            deny: hidden
+                ? (['ViewChannel', 'Connect'] as PermissionResolvable[])
+                : (['SendMessages', 'Connect'] as PermissionResolvable[]),
+        },
+
+        // Permissões do bot
+        {
+            id: botId,
+            allow: [
+                'ViewChannel',
+                'ManageChannels',
+                'MoveMembers',
+                'Connect',
+            ] as PermissionResolvable[],
+        },
+
+        // Permissões para moderadores com BanMembers
+        ...guild.roles.cache
+            .filter((role) => role.permissions.has('BanMembers'))
+            .map((role) => ({
+                id: role.id,
+                allow: [
+                    'ViewChannel',
+                    'ManageChannels',
+                    'MoveMembers',
+                    'MuteMembers',
+                    'DeafenMembers',
+                    'SendMessages',
+                    'Connect',
+                ] as PermissionResolvable[],
+            })),
+    ];
 }
 
 export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
@@ -84,10 +137,12 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         try {
             if (newState.channel && newState.channelId === channelId) {
                 let allowedUsers: string[] = [];
+                let hidden = false;
                 if (doc.exists) {
                     const data = doc.data() as VoiceChannelData;
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
+                    hidden = data.hidden;
 
                     Logger.info(
                         'PrivateVoiceChannel',
@@ -98,6 +153,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     await docRef.set({
                         channelName: newState.member.displayName,
                         permissions: allowedUsers,
+                        persistente: false,
+                        hidden: false,
                     });
                 }
 
@@ -130,36 +187,17 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     }
                 }
 
-                const permissionOverwrites: OverwriteResolvable[] = [
-                    ...allowedUsers.map((id) => ({
-                        id,
-                        allow: [
-                            'ViewChannel',
-                            'Connect',
-                        ] as PermissionResolvable[],
-                    })),
-                    {
-                        id: guild.roles.everyone.id,
-                        allow: ['ViewChannel'] as PermissionResolvable[],
-                        deny: ['Connect'] as PermissionResolvable[],
-                    },
-                    {
-                        id: Config.getConfigLocal().Config_Discord_BOT.id,
-                        allow: [
-                            'ViewChannel',
-                            'ManageChannels',
-                            'MoveMembers',
-                        ] as PermissionResolvable[],
-                    },
-                ];
-
                 // Criar o canal de voz
                 const newChannel = await guild.channels.create({
                     name: channelName,
                     parent: categoryId,
                     type: ChannelType.GuildVoice,
                     userLimit: 10,
-                    permissionOverwrites: permissionOverwrites,
+                    permissionOverwrites: buildPrivateChannelPermissions(
+                        guild,
+                        allowedUsers,
+                        hidden,
+                    ),
                     bitrate: channel.guild.maximumBitrate,
                 });
 
@@ -174,7 +212,12 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     content:
                         'Bem-vindo ao seu canal privado! Use os seguintes comandos:\n\n' +
                         '</canalprivado-rename:1317440925445787682> para renomear o canal.\n' +
-                        '</canalprivado:1317440925445787681> para adicionar ou remover pessoas.',
+                        '</canalprivado:1317440925445787681> para adicionar ou remover pessoas.' +
+                        '</canalprivado-persistencia:1317440925445787680> para tornar o canal persistente (Nunca ser deletado).\n' +
+                        '\n' +
+                        '<@' +
+                        userId +
+                        '> ',
                 });
             }
         } catch (error) {

@@ -17,6 +17,7 @@ import { FixLinks } from './event/FixLinks';
 import { SetChannelCommand } from './command/SetChannelCommand';
 import { ChannelCheckEvent } from './event/ChannelCheckEvent';
 import { NineHeadMention } from './event/NineHeadMention';
+import { CanalPrivadoOcultarCommand } from './command/CanalPrivadoOcultarCommand';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
@@ -76,6 +77,7 @@ async function start(): Promise<void> {
         new CanalPrivadoCommand(),
         new CanalPrivadoRenameCommand(),
         new CanalPrivadoPersistenciaCommand(),
+        new CanalPrivadoOcultarCommand(),
         new SetChannelCommand(),
     ]);
 

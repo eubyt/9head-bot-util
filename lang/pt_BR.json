@@ -56,6 +56,21 @@
             }
         },
 
+        "canalprivado_ocultar": {
+            "description": "「Canal Privado」 Alterna a visibilidade do seu canal privado (liga/desliga).",
+            "ocultar_ativado": "oculto",
+            "ocultar_desativado": "visível",
+            "success_messages": {
+                "sucess_title": ":white_check_mark:   Sucesso",
+                "ocultar_toggled": "A visibilidade do canal `{{channelName}}` foi alterada para {{status}}."
+            },
+            "error_messages": {
+                "erro_title": "Ocorreu um erro",
+                "no_private_channel": "Você não possui um canal privado.",
+                "ocultar_error": "Não foi possível alterar a visibilidade do canal."
+            }
+        },
+
         "canalprivado_rename": {
             "description": "「Canal Privado」 Trocar o nome do seu canal privado.",
             "options": {

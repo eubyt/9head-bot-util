@@ -3,12 +3,12 @@ import {
     CommandInteraction,
     Guild,
     OverwriteResolvable,
-    PermissionResolvable,
     VoiceChannel,
 } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
+import { buildPrivateChannelPermissions } from '../event/PrivateVoiceChannel';
 
 export class CanalPrivadoCommand extends CommandCreator {
     public name = 'canalprivado';
@@ -53,6 +53,7 @@ export class CanalPrivadoCommand extends CommandCreator {
         guild: Guild | null,
         channelName: string,
         permissions: string[],
+        hidden: boolean,
         docRef: FirebaseFirestore.DocumentReference,
     ): Promise<void> {
         if (!guild) return;
@@ -62,32 +63,14 @@ export class CanalPrivadoCommand extends CommandCreator {
                 ch.name === channelName && ch.type === ChannelType.GuildVoice,
         );
 
-        const permissionOverwrites: OverwriteResolvable[] = [
-            ...permissions.map((id) => ({
-                id,
-                allow: ['ViewChannel'] as PermissionResolvable[],
-            })),
-            {
-                id: guild.roles.everyone.id,
-                deny: ['ViewChannel'] as PermissionResolvable[],
-            },
-            {
-                id: Config.getConfigLocal().Config_Discord_BOT.id,
-                allow: [
-                    'ViewChannel',
-                    'ManageChannels',
-                    'MoveMembers',
-                ] as PermissionResolvable[],
-            },
-        ];
-
         if (channel) {
+            const permissionOverwrites: OverwriteResolvable[] =
+                buildPrivateChannelPermissions(guild, permissions, hidden);
+
             await (channel as VoiceChannel).permissionOverwrites.set(
                 permissionOverwrites,
             );
         }
-
-        console.log(permissionOverwrites);
 
         await docRef.set({
             channelName,
@@ -109,7 +92,12 @@ export class CanalPrivadoCommand extends CommandCreator {
 
         if (!doc.exists) return null;
 
-        return doc.data() as { permissions: string[]; channelName: string };
+        return doc.data() as {
+            permissions: string[];
+            channelName: string;
+            persistente: boolean;
+            hidden: boolean;
+        };
     }
 
     async execute(intr: CommandInteraction): Promise<void> {
@@ -167,7 +155,7 @@ export class CanalPrivadoCommand extends CommandCreator {
             return;
         }
 
-        const { permissions, channelName } = privateChannelData;
+        const { permissions, channelName, hidden } = privateChannelData;
 
         switch (subcommand) {
             case 'add':
@@ -177,6 +165,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         intr.guild,
                         channelName,
                         permissions,
+                        hidden,
                         Config.getGuildCollection(intr.guildId)
                             .collection('privateVoiceChannels')
                             .doc(intr.user.id),
@@ -223,6 +212,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         intr.guild,
                         channelName,
                         updatedPermissions,
+                        hidden,
                         Config.getGuildCollection(intr.guildId)
                             .collection('privateVoiceChannels')
                             .doc(intr.user.id),
