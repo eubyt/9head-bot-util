@@ -21,7 +21,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
     }
 
     async execute(message: Message): Promise<void> {
-        const fmRegexCommand = /\.\b(f|gw|r|c|u|judge|fm)\b(\s?.*)?/;
+        const fmRegexCommand = /\.\b(f|gw|r|c|u|judge|fm|w|a|top)\b(\s?.*)?/;
         const karutaCommand = /\k(\s?.*)?/;
         const mudaeCommand = /\$(\s?.*)?/;
         const chatCommand = message.content.split(' ')[0].toLowerCase();
