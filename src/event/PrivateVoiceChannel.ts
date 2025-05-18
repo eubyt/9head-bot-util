@@ -88,7 +88,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         if (typeof categoryId !== 'string') return;
 
         const guild: Guild = newState.guild;
-        let channelName = newState.member?.displayName ?? 'invalid';
+        let channelName = newState.channel?.name ?? 'invalid';
         const userId = newState.member?.id;
 
         if (!userId) {
@@ -160,6 +160,9 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                             persistente: false,
                             hidden: false,
                         });
+                    console.log(
+                        `Canal privado criado para o usuário ${userId}: ${channelName}`,
+                    );
                 }
 
                 const existingChannel = this.findExistingChannel(
