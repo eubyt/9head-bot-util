@@ -99,7 +99,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         // Modificação: A coleção é agora identificada pelo ID do servidor (guild)
         const docRef = Config.getGuildCollection(guild.id)
             .collection('privateVoiceChannels')
-            .doc(userId);
+            .where('channelName', '==', channelName)
+            .limit(1);
         const doc = await docRef.get();
 
         if (
@@ -107,8 +108,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             oldState.channel.members.size === 0 &&
             oldState.channelId !== channelId
         ) {
-            if (doc.exists) {
-                const data = doc.data() as VoiceChannelData;
+            if (!doc.empty) {
+                const data = doc.docs[0].data() as VoiceChannelData;
                 if (data.persistente) {
                     Logger.info(
                         'PrivateVoiceChannel',
@@ -138,8 +139,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             if (newState.channel && newState.channelId === channelId) {
                 let allowedUsers: string[] = [];
                 let hidden = false;
-                if (doc.exists) {
-                    const data = doc.data() as VoiceChannelData;
+                if (!doc.empty) {
+                    const data = doc.docs[0].data() as VoiceChannelData;
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
                     hidden = data.hidden;
@@ -150,12 +151,15 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     );
                 } else {
                     allowedUsers = [userId];
-                    await docRef.set({
-                        channelName: newState.member.displayName,
-                        permissions: allowedUsers,
-                        persistente: false,
-                        hidden: false,
-                    });
+                    await Config.getGuildCollection(guild.id)
+                        .collection('privateVoiceChannels')
+                        .doc(userId)
+                        .set({
+                            channelName: newState.member.displayName,
+                            permissions: allowedUsers,
+                            persistente: false,
+                            hidden: false,
+                        });
                 }
 
                 const existingChannel = this.findExistingChannel(

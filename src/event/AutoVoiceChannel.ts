@@ -8,15 +8,38 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
         const config = await Config.getConfig(newState.guild.id);
         if (config === undefined) return;
 
-        const channel = newState.channel ?? oldState.channel;
+        let channel = newState.channel ?? oldState.channel;
+        let channelParentId = channel?.parentId;
+
+        if (
+            newState.channel &&
+            oldState.channel &&
+            newState.channel.parentId !== oldState.channel.parentId
+        ) {
+            channelParentId = oldState.channel.parentId;
+            channel = oldState.channel;
+        }
+
         const { name } = config.AutoVoiceChannel.find(
-            (x) => x.categoryId === channel?.parentId,
+            (x) => x.categoryId === channelParentId,
         ) ?? {
             name: null,
         };
 
+        console.log(
+            'AutoVoiceChannel',
+            oldState.channel?.name,
+            newState.channel?.name,
+        );
+
         if (!channel?.parentId) return;
-        if (typeof name !== 'string') return;
+        if (typeof name !== 'string') {
+            Logger.info(
+                'AutoVoiceChannel',
+                `Nenhum canal encontrado para a categoria ${channel.parentId}`,
+            );
+            return;
+        }
 
         const category = channel.client.channels.cache.get(
             channel.parentId,
@@ -112,6 +135,8 @@ export class AutoVoiceChannel implements EventHandler<'VoiceState'> {
                     'AutoVoiceChannel',
                     `Canais vazios encontrados: ${emptyChannels.map((x) => x.name).join(', ')}`,
                 );
+
+                if (emptyChannels.size > 1) void limparCanais();
                 return;
             }
 

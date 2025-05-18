@@ -92,7 +92,12 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
         const subcommand = intr.options.get('comando', true).value as string;
         const categoria = intr.options.get('categoria')
             ?.channel as GuildBasedChannel;
-        const customName = intr.options.get('nome')?.value as string;
+        let customName = intr.options.get('nome')?.value as string;
+
+        //Verificar se o customName possui "#{number} se não tiver, adicionar"
+        if (customName && !customName.includes('#{number}')) {
+            customName += ' #{number}';
+        }
 
         switch (subcommand) {
             case 'clear':
