@@ -17,7 +17,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                     });
                 }
             });
-        }, 5000);
+        }, 10000);
     }
 
     async execute(message: Message): Promise<void> {
@@ -33,7 +33,8 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
 
         if (
             config.NivelChannel === message.channelId ||
-            config.FishingChannel === message.channelId
+            config.FishingChannel === message.channelId ||
+            config.AkinatorChannel === message.channelId
         ) {
             void this.deleteMessage(message);
             return;

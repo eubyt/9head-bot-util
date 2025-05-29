@@ -25,6 +25,7 @@ export interface ConfigData {
     CounterChannelAmount: number;
     CounterChannelRule: string;
     FishingChannel: string;
+    AkinatorChannel: string;
     NivelChannel: string;
     LoggerChannel: string;
     BanLoggerChannel: string;
@@ -275,6 +276,7 @@ export class Config {
             PrivateVoiceChannel: [],
             CommandChannel: 'null',
             FmBotChannel: 'null',
+            AkinatorChannel: 'null',
             KarutaChannel: 'null',
             MudaeChannel: 'null',
             CounterChannel: 'null',

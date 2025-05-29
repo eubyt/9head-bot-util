@@ -54,6 +54,10 @@ export class SetChannelCommand extends CommandCreator {
                     name: 'Ban Logger',
                     value: 'BanLoggerChannel',
                 },
+                {
+                    name: 'Akinator',
+                    value: 'AkinatorChannel',
+                },
             ],
         },
         {
@@ -159,6 +163,11 @@ export class SetChannelCommand extends CommandCreator {
             case 'LoggerChannel':
                 await db.update({
                     LoggerChannel: channel.id,
+                });
+                break;
+            case 'AkinatorChannel':
+                await db.update({
+                    AkinatorChannel: channel.id,
                 });
                 break;
             case 'BanLoggerChannel':
