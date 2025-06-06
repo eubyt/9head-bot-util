@@ -96,13 +96,6 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             return;
         }
 
-        // Modificação: A coleção é agora identificada pelo ID do servidor (guild)
-        const docRef = Config.getGuildCollection(guild.id)
-            .collection('privateVoiceChannels')
-            .where('channelName', '==', channelName)
-            .limit(1);
-        const doc = await docRef.get();
-
         console.log('PrivateVoiceChannel', {
             private: {
                 channelId,
@@ -125,6 +118,13 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 nameChannel: oldState.channel.name,
                 igual: oldState.channelId === channelId,
             });
+
+            const docRef = Config.getGuildCollection(guild.id)
+                .collection('privateVoiceChannels')
+                .where('channelName', '==', oldState.channel.name)
+                .limit(1);
+            const doc = await docRef.get();
+
             if (!doc.empty) {
                 const data = doc.docs[0].data() as VoiceChannelData;
                 if (data.persistente) {
@@ -157,8 +157,14 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                 console.log('PrivateVoiceChannel', 'Canal de espera...');
                 let allowedUsers: string[] = [];
                 let hidden = false;
-                if (!doc.empty) {
-                    const data = doc.docs[0].data() as VoiceChannelData;
+
+                const docRef = Config.getGuildCollection(guild.id)
+                    .collection('privateVoiceChannels')
+                    .doc(userId);
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const data = doc.data() as VoiceChannelData;
                     allowedUsers = data.permissions;
                     channelName = data.channelName;
                     hidden = data.hidden;
@@ -171,6 +177,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     allowedUsers = [userId];
                     channelName = newState.member.displayName;
 
+                    console.log('Criando database');
+
                     await Config.getGuildCollection(guild.id)
                         .collection('privateVoiceChannels')
                         .doc(userId)
@@ -180,6 +188,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                             persistente: false,
                             hidden: false,
                         });
+
                     console.log(
                         `Canal privado criado para o usuário ${userId}: ${channelName}`,
                     );
