@@ -103,11 +103,25 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             .limit(1);
         const doc = await docRef.get();
 
+        console.log('PrivateVoiceChannel', {
+            private: {
+                channelId,
+                categoryId,
+            },
+            channelName,
+        });
+
         if (
             oldState.channel &&
             oldState.channel.members.size === 0 &&
             oldState.channelId !== channelId
         ) {
+            console.log('Deletar PrivateChannel', {
+                channelId,
+                currentChannel: oldState.channelId,
+                nameChannel: oldState.channel.name,
+                igual: oldState.channelId === channelId,
+            });
             if (!doc.empty) {
                 const data = doc.docs[0].data() as VoiceChannelData;
                 if (data.persistente) {
@@ -136,7 +150,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         }
 
         try {
-            if (newState.channel && newState.channelId === channelId) {
+            if (newState.channel && newState.channelId !== channelId) {
+                console.log('PrivateVoiceChannel', 'Canal de espera...');
                 let allowedUsers: string[] = [];
                 let hidden = false;
                 if (!doc.empty) {
@@ -151,11 +166,13 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
                     );
                 } else {
                     allowedUsers = [userId];
+                    channelName = newState.member.displayName;
+
                     await Config.getGuildCollection(guild.id)
                         .collection('privateVoiceChannels')
                         .doc(userId)
                         .set({
-                            channelName: newState.member.displayName,
+                            channelName,
                             permissions: allowedUsers,
                             persistente: false,
                             hidden: false,
