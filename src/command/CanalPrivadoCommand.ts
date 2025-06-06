@@ -54,6 +54,7 @@ export class CanalPrivadoCommand extends CommandCreator {
         channelName: string,
         permissions: string[],
         hidden: boolean,
+        persistente: boolean,
         docRef: FirebaseFirestore.DocumentReference,
     ): Promise<void> {
         if (!guild) return;
@@ -75,6 +76,8 @@ export class CanalPrivadoCommand extends CommandCreator {
         await docRef.set({
             channelName,
             permissions,
+            hidden,
+            persistente,
         });
 
         Config.configCache.delete(guild.id);
@@ -155,7 +158,8 @@ export class CanalPrivadoCommand extends CommandCreator {
             return;
         }
 
-        const { permissions, channelName, hidden } = privateChannelData;
+        const { permissions, channelName, hidden, persistente } =
+            privateChannelData;
 
         switch (subcommand) {
             case 'add':
@@ -166,6 +170,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         channelName,
                         permissions,
                         hidden,
+                        persistente,
                         Config.getGuildCollection(intr.guildId)
                             .collection('privateVoiceChannels')
                             .doc(intr.user.id),
@@ -213,6 +218,7 @@ export class CanalPrivadoCommand extends CommandCreator {
                         channelName,
                         updatedPermissions,
                         hidden,
+                        persistente,
                         Config.getGuildCollection(intr.guildId)
                             .collection('privateVoiceChannels')
                             .doc(intr.user.id),
