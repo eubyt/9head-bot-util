@@ -114,6 +114,7 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         if (
             oldState.channel &&
             oldState.channel.members.size === 0 &&
+            oldState.channel.parentId === categoryId &&
             oldState.channelId !== channelId
         ) {
             console.log('Deletar PrivateChannel', {
