@@ -169,6 +169,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                             'Bug',
                             'Patch',
                             'Patch Notes',
+                            'Status Report',
                             'Hotfix',
                             'Killswitch',
                         ].some((e) =>
@@ -467,6 +468,22 @@ export class NineHeadMention implements EventHandler<'Message'> {
                         '@SkyBlock Fire Sale',
                         `<@&${NineHead.pingRole.skyblockFireSale}>`,
                     );
+                }
+
+                // Check message is embed
+                if (message.embeds.length > 0) {
+                    const messageEdit = message;
+                    messageEdit.content = fixMention;
+
+                    void this.sendMessageRepost(
+                        messageEdit,
+                        NineHead.gameChannel.skyblock,
+                        message.client,
+
+                        webhookUsername,
+                        webhookAvatarURL,
+                    );
+                    return;
                 }
 
                 void this.sendMessage(
