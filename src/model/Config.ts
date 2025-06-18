@@ -60,6 +60,7 @@ export interface ConfigData {
             skyblockFiesta: string;
             skyblockMythological: string;
             dbdNewsPing: string;
+            dbdTempoFila: string;
             dbdCodePing: string;
         };
         gameChannel: {

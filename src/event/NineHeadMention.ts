@@ -163,6 +163,10 @@ export class NineHeadMention implements EventHandler<'Message'> {
                 const webhookUsername = 'Dead By Daylight';
                 const webhookAvatarURL = 'https://i.imgur.com/byEWgKs.jpeg';
 
+                if (messageEdit.content.includes('Tempo das filas')) {
+                    messageEdit.content = `<@&${NineHead.pingRole.dbdTempoFila}> ${messageEdit.content}`;
+                }
+
                 if (messageEdit.embeds.length > 0) {
                     if (
                         [
