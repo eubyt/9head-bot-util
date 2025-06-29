@@ -52,7 +52,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
                                 'Erro ao deletar mensagem de notificação de Karuta',
                             );
                         });
-                    }, 5000);
+                    }, 60000);
                 }
             }
             return;
