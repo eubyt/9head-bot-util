@@ -99,12 +99,12 @@ export class DiscordBot {
             return;
         }
 
-        // Zoar o Ark
+        // Reagir com emotes personalizados para usuários específicos
 
         if (
             (message.author.id === '425754513832411146' ||
                 message.author.id === '245659496758640650' ||
-                message.author.id === '894703143693205556' ||
+                message.author.id === '776111846096109568' ||
                 message.author.id === '286701345090830336') &&
             !message.author.bot
         ) {
@@ -124,8 +124,9 @@ export class DiscordBot {
                 '1307353470101098576',
                 '1031288452077064222',
                 '1030827083523432578',
-                '🏳️‍🌈',
                 '🤓',
+                '😎',
+                '🦶',
             ];
 
             const randomEmoteId =
@@ -133,7 +134,11 @@ export class DiscordBot {
 
             const shouldReact = Math.random() < 0.01;
 
-            if (shouldReact) await message.react(randomEmoteId);
+            if (shouldReact) {
+                if (message.author.id === '776111846096109568') {
+                    await message.react('🏳️‍🌈');
+                } else await message.react(randomEmoteId);
+            }
         }
 
         if (fixLinks) {
