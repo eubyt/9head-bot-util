@@ -26,10 +26,37 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
         const mudaeCommand = /\$(\s?.*)?/;
         const chatCommand = message.content.split(' ')[0].toLowerCase();
 
-        if (message.author.bot || !message.guildId) return;
+        if (!message.guildId) return;
 
         const config = await Config.getConfig(message.guildId);
+        const NineHead = Config.getConfigLocal().NineHead;
         if (!config || !message.guildId) return;
+
+        if (message.author.bot) {
+            if (config.KarutaChannel === message.channelId) {
+                if (
+                    message.content.includes('server is currently active') ||
+                    message.content.includes('is dropping')
+                ) {
+                    const roleMention = `<@&${NineHead.pingRole.karutaPing}>`;
+                    const karutaNot = await (
+                        message.channel as TextChannel
+                    ).send({
+                        content: roleMention,
+                        reply: { messageReference: message.id },
+                    });
+                    setTimeout(() => {
+                        karutaNot.delete().catch(() => {
+                            Logger.error(
+                                'ChannelCheckEvent',
+                                'Erro ao deletar mensagem de notificação de Karuta',
+                            );
+                        });
+                    }, 5000);
+                }
+            }
+            return;
+        }
 
         if (
             config.NivelChannel === message.channelId ||

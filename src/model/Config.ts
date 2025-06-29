@@ -62,6 +62,7 @@ export interface ConfigData {
             dbdNewsPing: string;
             dbdTempoFila: string;
             dbdCodePing: string;
+            karutaPing: string;
         };
         gameChannel: {
             skyblock: string;
