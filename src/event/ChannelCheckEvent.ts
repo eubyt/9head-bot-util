@@ -32,7 +32,7 @@ export class ChannelCheckEvent implements EventHandler<'Message'> {
         const NineHead = Config.getConfigLocal().NineHead;
         if (!config || !message.guildId) return;
 
-        if (message.author.bot) {
+        if (message.author.bot || message.guildId === NineHead.serverMention) {
             if (config.KarutaChannel === message.channelId) {
                 if (
                     message.content.includes('server is currently active') ||
