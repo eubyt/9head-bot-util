@@ -172,14 +172,19 @@ export class NineHeadMention implements EventHandler<'Message'> {
                         [
                             'Bug',
                             'Patch',
+                            'PTB',
                             'Patch Notes',
                             'Status Report',
                             'Hotfix',
                             'Killswitch',
-                        ].some((e) =>
-                            messageEdit.embeds[0].title
-                                ?.toLowerCase()
-                                .includes(e.toLocaleLowerCase()),
+                        ].some(
+                            (e) =>
+                                messageEdit.embeds[0].title
+                                    ?.toLowerCase()
+                                    .includes(e.toLocaleLowerCase()) ??
+                                messageEdit.embeds[0].description
+                                    ?.toLowerCase()
+                                    .includes(e.toLocaleLowerCase()),
                         )
                     ) {
                         messageEdit.content = `<@&&${NineHead.pingRole.dbdNewsPing}>`;
