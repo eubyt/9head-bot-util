@@ -169,7 +169,7 @@ async function start(): Promise<void> {
         );
 
         // Iniciar o bot do Twitch
-        startTwitchBot(Config.getConfigLocal());
+        await startTwitchBot(Config.getConfigLocal());
     } catch (error) {
         if (error instanceof Error) {
             Logger.error(
