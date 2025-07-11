@@ -42,8 +42,6 @@ export async function startTwitchBot(config: ConfigData) {
             expiresIn: newTokenData.expiresIn ?? 0,
             refreshToken: newTokenData.refreshToken ?? '',
         };
-
-        console.log(tokenData);
     });
 
     await authProvider.addUserForToken(tokenData, ['chat']);

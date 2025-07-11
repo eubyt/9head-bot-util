@@ -1,5 +1,11 @@
 {
     "Discord_User_ID_DEV": [],
+    "twitch": {
+        "channels": ["eubyt"],
+        "identity": {
+            "username": "eubyt"
+        }
+    },
     "Embed": {
         "default": "#2B2D31"
     },
