@@ -1,12 +1,17 @@
 {
     "Discord_User_ID_DEV": [],
+    "twitch": {
+        "channels": ["eubyt"],
+        "identity": {
+            "username": "eubyt"
+        }
+    },
     "Embed": {
         "default": "#2B2D31"
     },
     "NineHead": {
         "serverMention": "1240785113898418256",
         "nineHeadServer": "1240785113898418256",
-        "webhook": "https://discord.com/api/webhooks/1328091993347326033/jVKwPrvkLUXQQYM78XC8K_F-2rJWOHHG_DmOlR3JPO1Za4Px282BdgBVugnSE70v2NBZ",
 
         "channelNewsMention": {
             "skyblockNews": "1323910111516692651",

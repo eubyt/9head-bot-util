@@ -29,9 +29,13 @@
         "dev": "yarn run build && yarn run start:bot"
     },
     "dependencies": {
-        "axios": "^1.7.9",
+        "@twurple/api": "^7.3.0",
+        "@twurple/auth": "^7.3.0",
+        "@twurple/chat": "^7.3.0",
+        "@twurple/eventsub-ws": "^7.3.0",
+        "@types/tmi.js": "^1.8.6",
         "discord.js": "^14.15.2",
-        "dotenv": "^16.4.7",
+        "dotenv": "^17.2.0",
         "firebase-admin": "^12.1.1"
     }
 }

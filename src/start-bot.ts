@@ -18,6 +18,7 @@ import { SetChannelCommand } from './command/SetChannelCommand';
 import { ChannelCheckEvent } from './event/ChannelCheckEvent';
 import { NineHeadMention } from './event/NineHeadMention';
 import { CanalPrivadoOcultarCommand } from './command/CanalPrivadoOcultarCommand';
+import { startTwitchBot } from './stream/twitch';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenvConfig();
@@ -166,6 +167,9 @@ async function start(): Promise<void> {
             'Bot Startup',
             'Bot iniciado com sucesso e funcionando normalmente',
         );
+
+        // Iniciar o bot do Twitch
+        startTwitchBot(Config.getConfigLocal());
     } catch (error) {
         if (error instanceof Error) {
             Logger.error(

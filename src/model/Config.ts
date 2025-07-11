@@ -4,6 +4,15 @@ import { Logger } from './Logger';
 import { Firestore } from 'firebase-admin/firestore';
 
 export interface ConfigData {
+    twitch: {
+        channels: string[];
+        identity: {
+            username: string;
+            clientId: string;
+            clientSecret: string;
+            refreshToken: string;
+        };
+    };
     Discord_User_ID_DEV: string[];
     Config_Discord_BOT: {
         id: string;
@@ -36,6 +45,7 @@ export interface ConfigData {
         serverMention: string;
         nineHeadServer: string;
         webhook: string;
+        webhookStreamMod: string;
         channelNewsMention: {
             skyblockNews: string;
             skyblockChangeVersion: string;
@@ -87,7 +97,7 @@ export class Config {
         string,
         Omit<
             ConfigData,
-            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead'
+            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead' | 'twitch'
         >
     >();
 
@@ -229,6 +239,21 @@ export class Config {
                 token: process.env.DISCORD_TOKEN ?? 'invalid',
             };
 
+            configLoader.NineHead.webhookStreamMod =
+                process.env.NINEHEAD_WEB_HOOK_STREAM_MOD ?? 'invalid';
+
+            configLoader.NineHead.webhook =
+                process.env.NINEHEAD_WEB_HOOK ?? 'invalid';
+
+            configLoader.twitch.identity.clientId =
+                process.env.TWITCH_ID_CLIENT ?? 'invalid';
+
+            configLoader.twitch.identity.clientSecret =
+                process.env.TWITCH_CLIENT_SECRET ?? 'invalid';
+
+            configLoader.twitch.identity.refreshToken =
+                process.env.TWITCH_REFRESH_TOKEN ?? 'invalid';
+
             Config.setConfig(configLoader);
 
             Logger.info(
@@ -272,7 +297,7 @@ export class Config {
 
         const defaultConfig: Omit<
             ConfigData,
-            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead'
+            'Discord_User_ID_DEV' | 'Config_Discord_BOT' | 'NineHead' | 'twitch'
         > = {
             AutoVoiceChannel: [],
             PrivateVoiceChannel: [],

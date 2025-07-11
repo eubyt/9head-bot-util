@@ -8,3 +8,4 @@ yarn-debug.log*
 yarn-error.log*
 
 build_env.sh
+config/twitch-tokens.json
