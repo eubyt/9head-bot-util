@@ -29,6 +29,9 @@ export async function logEditedMessage(
         let channelName = 'Canal desconhecido';
         let channelId = 'ID desconhecido';
         if ('name' in oldMessage.channel) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (oldMessage.channel.name === null) return; // Existe um erro se remover isso, sei lá...
+
             channelName = oldMessage.channel.name;
             channelId = oldMessage.channel.id;
         }

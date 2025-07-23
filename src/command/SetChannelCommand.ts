@@ -1,4 +1,8 @@
-import { CommandInteraction, GuildBasedChannel } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    GuildBasedChannel,
+} from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Logger } from '../model/Logger';
 import { Config } from '../model';
@@ -18,46 +22,16 @@ export class SetChannelCommand extends CommandCreator {
             description: 'Escolha o canal para definir',
             required: true,
             choices: [
-                {
-                    name: 'Comandos',
-                    value: 'comandos',
-                },
-                {
-                    name: 'FMbot',
-                    value: 'FMbot',
-                },
-                {
-                    name: 'Channel Count',
-                    value: 'ChannelCount',
-                },
-                {
-                    name: 'Fishing',
-                    value: 'FishingChannel',
-                },
-                {
-                    name: 'Karuta',
-                    value: 'KarutaChannel',
-                },
-                {
-                    name: 'Mudae',
-                    value: 'MudaeChannel',
-                },
-                {
-                    name: 'Nivel',
-                    value: 'NivelChannel',
-                },
-                {
-                    name: 'Logger',
-                    value: 'LoggerChannel',
-                },
-                {
-                    name: 'Ban Logger',
-                    value: 'BanLoggerChannel',
-                },
-                {
-                    name: 'Akinator',
-                    value: 'AkinatorChannel',
-                },
+                { name: 'Comandos', value: 'comandos' },
+                { name: 'FMbot', value: 'FMbot' },
+                { name: 'Channel Count', value: 'ChannelCount' },
+                { name: 'Fishing', value: 'FishingChannel' },
+                { name: 'Karuta', value: 'KarutaChannel' },
+                { name: 'Mudae', value: 'MudaeChannel' },
+                { name: 'Nivel', value: 'NivelChannel' },
+                { name: 'Logger', value: 'LoggerChannel' },
+                { name: 'Ban Logger', value: 'BanLoggerChannel' },
+                { name: 'Akinator', value: 'AkinatorChannel' },
             ],
         },
         {
@@ -75,7 +49,7 @@ export class SetChannelCommand extends CommandCreator {
         },
     ];
 
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const userId = intr.user.id;
         Logger.info(
             'SetChannelCommand',
@@ -131,49 +105,31 @@ export class SetChannelCommand extends CommandCreator {
 
         switch (typeChannel) {
             case 'comandos':
-                await db.update({
-                    CommandChannel: channel.id,
-                });
+                await db.update({ CommandChannel: channel.id });
                 break;
             case 'FMbot':
-                await db.update({
-                    FmBotChannel: channel.id,
-                });
+                await db.update({ FmBotChannel: channel.id });
                 break;
             case 'FishingChannel':
-                await db.update({
-                    FishingChannel: channel.id,
-                });
+                await db.update({ FishingChannel: channel.id });
                 break;
             case 'KarutaChannel':
-                await db.update({
-                    KarutaChannel: channel.id,
-                });
+                await db.update({ KarutaChannel: channel.id });
                 break;
             case 'MudaeChannel':
-                await db.update({
-                    MudaeChannel: channel.id,
-                });
+                await db.update({ MudaeChannel: channel.id });
                 break;
             case 'NivelChannel':
-                await db.update({
-                    NivelChannel: channel.id,
-                });
+                await db.update({ NivelChannel: channel.id });
                 break;
             case 'LoggerChannel':
-                await db.update({
-                    LoggerChannel: channel.id,
-                });
+                await db.update({ LoggerChannel: channel.id });
                 break;
             case 'AkinatorChannel':
-                await db.update({
-                    AkinatorChannel: channel.id,
-                });
+                await db.update({ AkinatorChannel: channel.id });
                 break;
             case 'BanLoggerChannel':
-                await db.update({
-                    BanLoggerChannel: channel.id,
-                });
+                await db.update({ BanLoggerChannel: channel.id });
                 break;
             case 'ChannelCount':
                 if (!role) {

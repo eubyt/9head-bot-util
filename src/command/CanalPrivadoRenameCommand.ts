@@ -1,8 +1,8 @@
 import {
-    CommandInteraction,
     ChannelType,
     VoiceChannel,
     GuildMember,
+    ChatInputCommandInteraction,
 } from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Config } from '../model';
@@ -60,7 +60,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
     /**
      * Função principal que executa o comando de renomear o canal privado.
      */
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const newName = intr.options.get('nome', true).value as string;
         const userId = intr.user.id;
 
@@ -93,9 +93,7 @@ export class CanalPrivadoRenameCommand extends CommandCreator {
 
         const guildId = intr.guildId;
         if (!intr.guild || !guildId) {
-            await intr.editReply({
-                content: 'Guild ID não encontrado.',
-            });
+            await intr.editReply({ content: 'Guild ID não encontrado.' });
             return;
         }
 

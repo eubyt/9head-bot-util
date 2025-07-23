@@ -1,6 +1,6 @@
 import {
     ChannelType,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     Guild,
     OverwriteResolvable,
     VoiceChannel,
@@ -73,12 +73,7 @@ export class CanalPrivadoCommand extends CommandCreator {
             );
         }
 
-        await docRef.set({
-            channelName,
-            permissions,
-            hidden,
-            persistente,
-        });
+        await docRef.set({ channelName, permissions, hidden, persistente });
 
         Config.configCache.delete(guild.id);
 
@@ -103,7 +98,7 @@ export class CanalPrivadoCommand extends CommandCreator {
         };
     }
 
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const subcommand = intr.options.get('comando', true).value;
         const user = intr.options.get('usuario', true).user;
 

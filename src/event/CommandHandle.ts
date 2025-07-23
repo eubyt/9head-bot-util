@@ -1,4 +1,8 @@
-import { CommandInteraction, AutocompleteInteraction } from 'discord.js';
+import {
+    CommandInteraction,
+    AutocompleteInteraction,
+    ChatInputCommandInteraction,
+} from 'discord.js';
 import { EventHandler } from './EventHandler';
 import { CommandBot } from '../command/CommandBot';
 import { ConfigData } from '../model/Config';
@@ -7,7 +11,10 @@ export class CommandHandle implements EventHandler<'Command'> {
     constructor(public commands: CommandBot[]) {}
 
     async execute(
-        intr: CommandInteraction | AutocompleteInteraction,
+        intr:
+            | CommandInteraction
+            | AutocompleteInteraction
+            | ChatInputCommandInteraction,
         configGuild?: ConfigData,
     ) {
         // Não responder si mesmo ou bots...

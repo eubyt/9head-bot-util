@@ -1,5 +1,6 @@
 import {
     AutocompleteInteraction,
+    ChatInputCommandInteraction,
     Client,
     ClientUser,
     CommandInteraction,
@@ -82,6 +83,7 @@ export class DiscordBot {
         const { commandHandle } = this.data_bot;
         if (
             intr instanceof CommandInteraction ||
+            intr instanceof ChatInputCommandInteraction ||
             intr instanceof AutocompleteInteraction
         ) {
             try {

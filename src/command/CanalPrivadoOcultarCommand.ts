@@ -84,9 +84,7 @@ export class CanalPrivadoOcultarCommand extends CommandCreator {
 
         const newHiddenValue = !hidden;
         try {
-            await privateChannelDoc.ref.update({
-                hidden: newHiddenValue,
-            });
+            await privateChannelDoc.ref.update({ hidden: newHiddenValue });
 
             const channel = guild.channels.cache.find(
                 (ch) =>

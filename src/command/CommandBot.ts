@@ -1,4 +1,5 @@
 import {
+    ChatInputCommandInteraction,
     ColorResolvable,
     CommandInteraction,
     EmbedBuilder,
@@ -27,7 +28,7 @@ export interface CommandBot {
     options: unknown[];
 
     execute(
-        intr: CommandInteraction,
+        intr: CommandInteraction | ChatInputCommandInteraction,
         configData: ConfigData | undefined,
     ): Promise<void>;
 }
@@ -42,7 +43,7 @@ export abstract class CommandCreator implements CommandBot {
     abstract description_localizations: LocalizationMap | null;
 
     abstract execute(
-        intr: CommandInteraction,
+        intr: CommandInteraction | ChatInputCommandInteraction,
         configData: ConfigData | undefined,
     ): Promise<void>;
 
@@ -68,18 +69,13 @@ export abstract class CommandCreator implements CommandBot {
                 iconURL: intr.user.avatarURL()?.toString(),
             });
 
-        await intr.editReply({
-            embeds: [embed],
-        });
+        await intr.editReply({ embeds: [embed] });
     }
 
     public BasicEmbed(user: User, color: ColorResolvable) {
         return new EmbedBuilder()
             .setTimestamp()
-            .setFooter({
-                text: user.id,
-                iconURL: user.avatarURL()?.toString(),
-            })
+            .setFooter({ text: user.id, iconURL: user.avatarURL()?.toString() })
             .setColor(color);
     }
 

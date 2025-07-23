@@ -26,7 +26,11 @@ export async function logDeletedMessage(
 
         let channelName = 'Canal desconhecido';
         let channelId = 'ID desconhecido';
+
         if ('name' in message.channel) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (message.channel.name === null) return; // Existe um erro se remover isso, sei lá...
+
             channelName = message.channel.name;
             channelId = message.channel.id;
         }
@@ -44,7 +48,7 @@ export async function logDeletedMessage(
             const logEntry = auditLogs.entries.first();
 
             if (
-                logEntry &&
+                logEntry?.target &&
                 logEntry.target.id === message.author?.id &&
                 logEntry.extra.channel.id === message.channel.id
             ) {

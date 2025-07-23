@@ -1,4 +1,9 @@
-import { ChannelType, CommandInteraction, GuildBasedChannel } from 'discord.js';
+import {
+    ChannelType,
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    GuildBasedChannel,
+} from 'discord.js';
 import { CommandCreator } from './CommandBot';
 import { Config } from '../model';
 import { Logger } from '../model/Logger';
@@ -61,7 +66,7 @@ export class SetAutoVoiceChannelCommand extends CommandCreator {
         },
     ];
 
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const userId = intr.user.id;
 
         Logger.info(

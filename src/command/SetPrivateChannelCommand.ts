@@ -1,5 +1,6 @@
 import {
     ChannelType,
+    ChatInputCommandInteraction,
     CommandInteraction,
     CommandInteractionOption,
 } from 'discord.js';
@@ -66,7 +67,7 @@ export class SetPrivateChannelCommand extends CommandCreator {
         },
     ];
 
-    async execute(intr: CommandInteraction): Promise<void> {
+    async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const userId = intr.user.id;
 
         Logger.info(
@@ -205,9 +206,7 @@ export class SetPrivateChannelCommand extends CommandCreator {
         }
 
         const db = Config.getGuildCollection(intr.guildId);
-        await db.update({
-            PrivateVoiceChannel: [],
-        });
+        await db.update({ PrivateVoiceChannel: [] });
         Config.configCache.delete(intr.guildId);
 
         await this.sendEmbed(
@@ -331,9 +330,7 @@ export class SetPrivateChannelCommand extends CommandCreator {
             return;
         }
 
-        await db.update({
-            PrivateVoiceChannel: updatedPrivateVoiceChannel,
-        });
+        await db.update({ PrivateVoiceChannel: updatedPrivateVoiceChannel });
 
         Config.configCache.delete(intr.guildId);
 
