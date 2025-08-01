@@ -96,6 +96,8 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
             return;
         }
 
+        if (newState.channelId === '1400694762213740576') return;
+
         console.log('PrivateVoiceChannel', {
             private: {
                 channelId,
@@ -153,7 +155,6 @@ export class PrivateVoiceChannel implements EventHandler<'VoiceState'> {
         }
 
         try {
-            if (newState.channelId === '1400653486785560708') return;
             if (newState.channel && newState.channelId === channelId) {
                 console.log('PrivateVoiceChannel', 'Canal de espera...');
                 let allowedUsers: string[] = [];
