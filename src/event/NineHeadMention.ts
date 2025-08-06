@@ -187,7 +187,7 @@ export class NineHeadMention implements EventHandler<'Message'> {
                                     .includes(e.toLocaleLowerCase()),
                         )
                     ) {
-                        messageEdit.content = `<@&&${NineHead.pingRole.dbdNewsPing}>`;
+                        messageEdit.content = `<@&${NineHead.pingRole.dbdNewsPing}>`;
                     }
                 }
 
